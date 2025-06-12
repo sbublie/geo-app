@@ -4,7 +4,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from '@/components/ui/button';
 import * as turf from '@turf/turf';
 
-import { AreaTypes } from '@/types/areas';
+import { getAreaTypes } from '@/types/areas';
+import { useTranslations } from 'next-intl';
 
 export default function AreaTypeDialog({
     showAreaTypeDialog,
@@ -17,7 +18,9 @@ export default function AreaTypeDialog({
     pendingPolygon: { points: [number, number][] } | null;
     handleAreaTypeSelect: (type: string) => void;
 }) {
+    const t = useTranslations();
     const [selectedType, setSelectedType] = useState<string>('');
+    const AreaTypes = getAreaTypes(t);
 
     // Reset selected type when dialog opens
     useEffect(() => {

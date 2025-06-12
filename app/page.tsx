@@ -3,6 +3,7 @@
 // libraries
 import { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
+import {useTranslations} from 'next-intl';
 
 // components
 import { mapbox_style } from "@/components/mapbox_style";
@@ -35,6 +36,7 @@ export default function Home() {
   const map = useRef<mapboxgl.Map | null>(null);
   const marker = useRef<mapboxgl.Marker | null>(null);
   const lastCircleParams = useRef<{ center: [number, number]; radius: number } | null>(null);
+  const t = useTranslations();
 
   // State variables
   const [coordinates, setCoordinates] = useState<{ lng: number; lat: number }>({ lng: 9, lat: 48 });
@@ -96,7 +98,7 @@ export default function Home() {
 
     // Add polygon to state and map
     setDrawnPolygons(prev => [...prev, pendingPolygon.points]);
-    addCompletedPolygon(pendingPolygon.points, pendingPolygon.index, areaType, map);
+    addCompletedPolygon(pendingPolygon.points, pendingPolygon.index, areaType, map, t);
 
     // Close dialog and reset pending polygon
     setShowAreaTypeDialog(false);
@@ -379,19 +381,19 @@ export default function Home() {
       {gameState === 'idle' && (
         <div className="absolute top-4 right-4 flex flex-col gap-4 z-10">
           <div className="bg-white bg-opacity-90 p-3 rounded-lg shadow-lg border min-w-[200px]">
-            <div className="text-lg font-semibold text-gray-700 mb-2">GeoGame</div>
+            <div className="text-lg font-semibold text-gray-700 mb-2">{t('app.title')}</div>
             <div className="text-sm text-gray-600">
-              Drag the marker to the desired catastrophe location.
+              {t('app.description')}
             </div>
             <div className="flex items-center justify-center mt-3">
-              <Button className="mt-2 bg-green-500 text-white w-full" onClick={startGame}>Start</Button>
+              <Button className="mt-2 bg-green-500 text-white w-full" onClick={startGame}>{t('game.start')}</Button>
             </div>
           </div>
 
           <div className="bg-white bg-opacity-90 p-4 rounded-lg shadow-lg border min-w-[250px]">
             <div className="space-y-3">
               <Label htmlFor="radius-slider" className="text-sm font-semibold text-gray-700">
-                Radius: {radius}m
+                {t('common.radius')}: {radius}m
               </Label>
               <Slider
                 id="radius-slider"
@@ -414,7 +416,7 @@ export default function Home() {
 
       {gameState === 'loading' && (
         <div className="absolute top-4 right-4 z-10 flex flex-col items-center justify-center bg-white bg-opacity-90 p-4 rounded-lg shadow-lg border min-w-[370px]">
-          <div className="text-xl font-semibold text-gray-700 mb-2">Loading...</div>
+          <div className="text-xl font-semibold text-gray-700 mb-2">{t('game.loading')}</div>
           <LoadingSpinner size={35} />
         </div>
       )}
@@ -424,42 +426,42 @@ export default function Home() {
       {gameState === 'playing' && (
         <div className="absolute top-4 right-4 flex flex-col gap-4 z-10">
           <div className="bg-white bg-opacity-90 p-3 rounded-lg shadow-lg border min-w-[200px]">
-            <div className="text-lg font-semibold text-gray-700 mb-2">Catastrophe Active</div>
+            <div className="text-lg font-semibold text-gray-700 mb-2">{t('game.active')}</div>
             <div className="text-sm text-gray-600 mb-3">
-              Click on train or power lines to view details.
+              {t('game.instructions')}
             </div>
             <Button
               className="bg-red-500 hover:bg-red-600 text-white w-full"
               onClick={resetGame}
             >
-              Reset Catastrophe
+              {t('game.reset')}
             </Button>
           </div>
           {/* Add polygon drawing controls */}
           <div className="bg-white bg-opacity-90 p-3 rounded-lg shadow-lg border min-w-[200px]">
-            <div className="text-sm font-semibold text-gray-700 mb-2">Polygon Drawing</div>
+            <div className="text-sm font-semibold text-gray-700 mb-2">{t('drawing.title')}</div>
             <div className="text-xs text-gray-600 mb-3">
-              {isDrawingMode ? 'Click to add points, double-click to finish' : 'Draw custom areas'}
+              {isDrawingMode ? t('drawing.instructions') : t('drawing.instructionsIdle')}
             </div>
             <div className="flex flex-col gap-2">
               <Button
                 className={`text-white w-full ${isDrawingMode ? 'bg-red-500 hover:bg-red-600' : 'bg-blue-500 hover:bg-blue-600'}`}
                 onClick={toggleDrawingMode}
               >
-                {isDrawingMode ? 'Stop Drawing' : 'Start Drawing'}
+                {isDrawingMode ? t('drawing.stopDrawing') : t('drawing.startDrawing')}
               </Button>
               {drawnPolygons.length > 0 && (
                 <Button
                   className="bg-gray-500 hover:bg-gray-600 text-white w-full text-xs"
                   onClick={triggerClearAllPolygons}
                 >
-                  Clear All ({drawnPolygons.length})
+                  {t('drawing.clearAll')} ({drawnPolygons.length})
                 </Button>
               )}
             </div>
             {currentPolygon.length > 0 && (
               <div className="text-xs text-gray-500 mt-2">
-                Current: {currentPolygon.length} points
+                {t('drawing.currentPoints', { count: currentPolygon.length })}
               </div>
             )}
           </div>
@@ -470,11 +472,11 @@ export default function Home() {
 
         {/* Weather info display */}
         <div className="bg-white bg-opacity-90 p-4 rounded-lg shadow-lg border min-w-[370px]">
-          <div className="text-sm font-semibold text-gray-700 mb-3">Weather Conditions</div>
+          <div className="text-sm font-semibold text-gray-700 mb-3">{t('weather.title')}</div>
           {weatherLoading ? (
             <div className="flex items-center justify-center py-4">
               <LoadingSpinner size={24} />
-              <span className="ml-2 text-sm text-gray-600">Loading weather...</span>
+              <span className="ml-2 text-sm text-gray-600">{t('weather.loading')}</span>
             </div>
           ) : weatherData ? (
             <div className="grid grid-cols-2 gap-4">
@@ -486,14 +488,14 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="text-xs text-gray-600 space-y-1">
-                  <div><strong>Humidity:</strong> {weatherData.humidity}%</div>
-                  <div><strong>Pressure:</strong> {weatherData.pressure} hPa</div>
+                  <div><strong>{t('weather.humidity')}:</strong> {weatherData.humidity}%</div>
+                  <div><strong>{t('weather.pressure')}:</strong> {weatherData.pressure} hPa</div>
                 </div>
               </div>
 
               {/* Right side - Wind info */}
               <div className="space-y-2">
-                <div className="text-xs font-semibold text-gray-700 text-center">Wind</div>
+                <div className="text-xs font-semibold text-gray-700 text-center">{t('weather.wind')}</div>
                 <WindArrow direction={weatherData.windDirection} />
                 <div className="text-xs text-gray-600 text-center space-y-1">
                   <div><strong>{getWindDirectionText(weatherData.windDirection)}</strong></div>
@@ -504,20 +506,20 @@ export default function Home() {
             </div>
           ) : (
             <div className="text-sm text-gray-500 py-4 text-center">
-              Weather data unavailable
+              {t('weather.unavailable')}
             </div>
           )}
         </div>
 
         {/* Location info display */}
         <div className="bg-white bg-opacity-90 p-3 rounded-lg shadow-lg border min-w-[370px]">
-          <div className="text-sm font-semibold text-gray-700 mb-2">Location Info</div>
+          <div className="text-sm font-semibold text-gray-700 mb-2">{t('location.title')}</div>
           <div className="text-xs text-gray-600 space-y-1">
-            <div><strong>Street:</strong> {locationInfo.street}</div>
-            <div><strong>City:</strong> {locationInfo.city}</div>
+            <div><strong>{t('location.street')}:</strong> {locationInfo.street}</div>
+            <div><strong>{t('location.city')}:</strong> {locationInfo.city}</div>
             <div className="border-t pt-1 mt-2">
-              <div>Lat: {coordinates.lat}</div>
-              <div>Lng: {coordinates.lng}</div>
+              <div>{t('location.lat')} {coordinates.lat}</div>
+              <div>{t('location.lng')} {coordinates.lng}</div>
             </div>
           </div>
         </div>

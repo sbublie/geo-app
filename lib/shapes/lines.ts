@@ -135,7 +135,6 @@ export function drawInfrastructureLines<T extends LineType>(
     }
   });
 
-  console.log(`Drew ${lines.length} ${lineType} lines on the map`);
 }
 
 // Convenience functions for specific line types

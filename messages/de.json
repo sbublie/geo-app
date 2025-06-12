@@ -1,0 +1,58 @@
+{
+  "app": {
+    "title": "GeoGame",
+    "description": "Ziehen Sie den Marker an die gewünschte Katastrophenstelle."
+  },
+  "common": {
+    "radius": "Radius"
+  },
+  "game": {
+    "start": "Starten",
+    "reset": "Katastrophe zurücksetzen",
+    "loading": "Lädt...",
+    "active": "Katastrophe aktiv",
+    "instructions": "Klicken Sie auf Zug- oder Stromleitungen, um Details anzuzeigen."
+  },
+  "drawing": {
+    "title": "Polygon zeichnen",
+    "instructions": "Klicken zum Hinzufügen von Punkten, Doppelklick zum Beenden",
+    "instructionsIdle": "Benutzerdefinierte Bereiche zeichnen",
+    "startDrawing": "Zeichnen starten",
+    "stopDrawing": "Zeichnen beenden",
+    "clearAll": "Alle löschen",
+    "currentPoints": "Aktuell: {count} Punkte"
+  },
+  "weather": {
+    "title": "Wetterbedingungen",
+    "loading": "Wetter wird geladen...",
+    "unavailable": "Wetterdaten nicht verfügbar",
+    "humidity": "Luftfeuchtigkeit",
+    "pressure": "Luftdruck",
+    "wind": "Wind"
+  },
+  "location": {
+    "title": "Standortinfo",
+    "street": "Straße",
+    "city": "Stadt",
+    "lat": "Breitengrad",
+    "lng": "Längengrad"
+  },
+  "areas": {
+    "selectType": "Bereichstyp auswählen",
+    "selectDescription": "Wählen Sie den Typ des gezeichneten Bereichs zur ordnungsgemäßen Kategorisierung.",
+    "polygonArea": "Polygonfläche",
+    "types": {
+      "keep_free": "Freihalten",
+      "red": "Behandlungsplatz Rot",
+      "yellow": "Behandlungsplatz Gelb",
+      "green": "Behandlungsplatz Grün",
+      "black_blue": "Ablageplatz Schwarz/Blau",
+      "patient": "Patientenablage",
+      "damage": "Schadenstelle",
+      "loading": "Ladezone",
+      "danger": "Gefahrenstelle",
+      "heli": "Landeplatz Helikopter",
+      "rescue": "Rettungsmittelhalteplatz"
+    }
+  }
+}

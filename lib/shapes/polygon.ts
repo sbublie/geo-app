@@ -1,13 +1,12 @@
 
 import React from 'react';
 import * as turf from '@turf/turf';
-import { AreaTypes } from '@/types/areas';
+import { getAreaTypes } from '@/types/areas';
+import { useTranslations } from 'next-intl';
 
 // Function to update polygon preview
 export function updatePolygonPreview(points: [number, number][], map: React.MutableRefObject<mapboxgl.Map | null>) {
     if (!map.current || points.length < 1) return;
-
-    console.log('Updating polygon preview with points:', points); // Debug log
 
     if (points.length === 1) {
         // Show just the first point
@@ -113,8 +112,9 @@ export function updatePolygonPreview(points: [number, number][], map: React.Muta
 
 
 // Function to add completed polygon
-export function addCompletedPolygon(points: [number, number][], index: number, areaType: string, map: React.MutableRefObject<mapboxgl.Map | null>) {
+export function addCompletedPolygon(points: [number, number][], index: number, areaType: string, map: React.MutableRefObject<mapboxgl.Map | null>, t: ReturnType<typeof useTranslations>) {
     if (!map.current || points.length < 3) return;
+    const AreaTypes = getAreaTypes(t);
 
     // Close the polygon by adding the first point at the end
     const closedPoints = [...points, points[0]];
@@ -226,7 +226,6 @@ export function addCompletedPolygon(points: [number, number][], index: number, a
         }
     }, `polygon-label-text-${index}`); // Insert below text layer
 
-    console.log(`Polygon ${index} created: ${areaText} - ${typeInfo.label}`);
 };
 
 // Function to clear polygon preview
