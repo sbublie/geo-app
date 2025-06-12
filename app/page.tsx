@@ -1,8 +1,10 @@
 'use client';
 
+// libraries
 import { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
+
+// components
 import { mapbox_style } from "@/components/mapbox_style";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
@@ -10,54 +12,45 @@ import { getLocationInfo } from "@/lib/places";
 import { Button } from "@/components/ui/button";
 import { updateCircle } from "@/lib/shapes/circle";
 import { LoadingSpinner } from "@/components/ui/spinner";
-import { getTrainLinesInArea, createBoundingBoxFromCenter, TrainLine, getPowerLinesInArea, PowerLine } from "@/lib/osmApi";
-import { drawTrainLines, drawPowerLines, removeInfrastructureLines } from "@/lib/shapes/lines";
 import { TrainLineDetails, PowerLineDetails } from "@/components/map/details";
-import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 import AreaTypeDialog from "@/components/dialogs/areaTypeDialog";
 import { addCompletedPolygon, updatePolygonPreview, clearAllPolygons, clearPolygonPreview } from "@/lib/shapes/polygon";
 import WindArrow from '@/components/ui/wind';
-import { fetchWeatherData } from "@/lib/weatherApi";
 
+// functions
+import { drawTrainLines, drawPowerLines, removeInfrastructureLines } from "@/lib/shapes/lines";
+
+// API
+import fetchWeatherData from "@/lib/weatherApi";
+import { getTrainLinesInArea, createBoundingBoxFromCenter, TrainLine, getPowerLinesInArea, PowerLine } from "@/lib/osmApi";
+
+// Types
+import WeatherData from '@/types/weatherData';
+
+import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
+import 'mapbox-gl/dist/mapbox-gl.css';
 
 export default function Home() {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const marker = useRef<mapboxgl.Marker | null>(null);
+  const lastCircleParams = useRef<{ center: [number, number]; radius: number } | null>(null);
+
+  // State variables
   const [coordinates, setCoordinates] = useState<{ lng: number; lat: number }>({ lng: 9, lat: 48 });
   const [locationInfo, setLocationInfo] = useState<{ street: string; city: string }>({ street: '', city: '' });
   const [radius, setRadius] = useState<number>(2000); // radius in meters
   const [mapLoaded, setMapLoaded] = useState(false);
   const [gameState, setGameState] = useState<'idle' | 'loading' | 'playing'>('idle');
-
-  const lastCircleParams = useRef<{ center: [number, number]; radius: number } | null>(null);
-
-
   const [selectedTrainLine, setSelectedTrainLine] = useState<TrainLine | null>(null);
   const [selectedPowerLine, setSelectedPowerLine] = useState<PowerLine | null>(null);
-
-  // Add these new state variables at the top with your other state
   const [isDrawingMode, setIsDrawingMode] = useState(false);
   const [currentPolygon, setCurrentPolygon] = useState<[number, number][]>([]);
   const [drawnPolygons, setDrawnPolygons] = useState<[number, number][][]>([]);
-
-  // Add new state variables for the popup
   const [showAreaTypeDialog, setShowAreaTypeDialog] = useState(false);
-  const [pendingPolygon, setPendingPolygon] = useState<{
-    points: [number, number][];
-    index: number;
-  } | null>(null);
+  const [pendingPolygon, setPendingPolygon] = useState<{points: [number, number][];index: number;} | null>(null);
   const [polygonTypes, setPolygonTypes] = useState<{ [key: number]: string }>({});
-
-  const [weatherData, setWeatherData] = useState<{
-    temperature: number;
-    description: string;
-    windSpeed: number;
-    windDirection: number;
-    humidity: number;
-    pressure: number;
-    icon: string;
-  } | null>(null);
+  const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [weatherLoading, setWeatherLoading] = useState(false);
 
   const getWindDirectionText = (degrees: number) => {
@@ -490,7 +483,6 @@ export default function Home() {
                 <div className="flex items-center gap-2">
                   <div>
                     <div className="text-2xl font-bold text-gray-800">{weatherData.temperature}°C</div>
-                    <div className="text-xs text-gray-600 capitalize">{weatherData.description}</div>
                   </div>
                 </div>
                 <div className="text-xs text-gray-600 space-y-1">
