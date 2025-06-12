@@ -1,7 +1,8 @@
-export async function fetchWeatherData(lat: number, lng: number, setWeatherData: React.Dispatch<React.SetStateAction<WeatherData | null>>, setWeatherLoading: React.Dispatch<React.SetStateAction<boolean>>): Promise<void> {
+import WeatherData from "@/types/weatherData";
+
+export default async function fetchWeatherData(lat: number, lng: number, setWeatherData: React.Dispatch<React.SetStateAction<WeatherData | null>>, setWeatherLoading: React.Dispatch<React.SetStateAction<boolean>>): Promise<void> {
   setWeatherLoading(true);
   try {
-    const API_KEY = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY;
     const response = await fetch(
       `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,wind_speed_10ms,wind_direction_10m,relative_humidity_2m,surface_pressure`
     );

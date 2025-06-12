@@ -1,4 +1,4 @@
-export default function WindArrow(direction: number) {
+export default function WindArrow({ direction }: { direction: number }) {
     return (
         <div className="flex items-center justify-center">
             <div className="relative w-12 h-12">
