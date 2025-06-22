@@ -10,17 +10,18 @@ interface MapContainerProps {
   gameState: 'idle' | 'loading' | 'playing';
   coordinates: { lng: number; lat: number };
   radius: number;
+  markerRef: React.MutableRefObject<mapboxgl.Marker | null>;
 }
 
 export default function MapContainer({ 
   onMapLoad, 
   onMarkerDragEnd, 
   gameState, 
-  coordinates
+  coordinates,
+  markerRef
 }: MapContainerProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
-  const marker = useRef<mapboxgl.Marker | null>(null);
 
   useEffect(() => {
     if (map.current) return;
@@ -36,32 +37,32 @@ export default function MapContainer({
       });
 
       map.current.on('load', () => {
-        marker.current = new mapboxgl.Marker({
+        markerRef.current = new mapboxgl.Marker({
           draggable: true,
           color: '#ff0000'
         })
           .setLngLat([9, 48])
           .addTo(map.current!);
 
-        marker.current.on('dragend', () => {
-          const lngLat = marker.current!.getLngLat();
+        markerRef.current.on('dragend', () => {
+          const lngLat = markerRef.current!.getLngLat();
           onMarkerDragEnd(lngLat);
         });
 
         onMapLoad(map);
       });
     }
-  }, [onMapLoad, onMarkerDragEnd]);
+  }, [onMapLoad, onMarkerDragEnd, markerRef]);
 
   // Update marker based on game state and coordinates
   useEffect(() => {
-    if (!marker.current) return;
+    if (!markerRef.current) return;
 
     const isDraggable = gameState !== 'playing';
-    marker.current.setDraggable(isDraggable);
-    marker.current.setLngLat([coordinates.lng, coordinates.lat]);
+    markerRef.current.setDraggable(isDraggable);
+    markerRef.current.setLngLat([coordinates.lng, coordinates.lat]);
 
-    const markerElement = marker.current.getElement();
+    const markerElement = markerRef.current.getElement();
     const svgElement = markerElement.querySelector('svg');
     if (svgElement) {
       const path = svgElement.querySelector('path');
@@ -69,7 +70,7 @@ export default function MapContainer({
         path.setAttribute('fill', isDraggable ? '#ff0000' : '#666666');
       }
     }
-  }, [gameState, coordinates]);
+  }, [gameState, coordinates, markerRef]);
 
   return <div ref={mapContainer} className="w-full h-full" />;
 }

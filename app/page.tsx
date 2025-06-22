@@ -37,7 +37,8 @@ export default function Home() {
     resetGame,
     handleToggleTrainLines,
     handleTogglePowerLines,
-    map
+    map,
+    marker,
   } = useMapLogic();
 
   const {
@@ -65,6 +66,7 @@ export default function Home() {
         gameState={gameState}
         coordinates={coordinates}
         radius={radius}
+        markerRef={marker}
       />
 
       {/* Filter Menu */}

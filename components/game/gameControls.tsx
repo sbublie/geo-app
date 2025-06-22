@@ -46,7 +46,7 @@ export default function GameControls({
             <Slider
               id="radius-slider"
               min={100}
-              max={5000}
+              max={2000}
               step={50}
               value={[radius]}
               onValueChange={(value) => setRadius(value[0])}
@@ -54,7 +54,7 @@ export default function GameControls({
             />
             <div className="flex justify-between text-xs text-gray-500">
               <span>100m</span>
-              <span>5000m</span>
+              <span>2000m</span>
             </div>
           </div>
         </div>
@@ -64,8 +64,8 @@ export default function GameControls({
 
   if (gameState === 'loading') {
     return (
-      <div className="flex flex-col items-center justify-center bg-white bg-opacity-90 p-4 rounded-lg shadow-lg border max-w-[370px]">
-        <div className="text-xl font-semibold text-gray-700 mb-2">{t('game.loading')}</div>
+      <div className="flex flex-col items-center justify-center bg-white bg-opacity-90 p-4 rounded-lg shadow-lg border w-[370px]">
+        <div className="text-xl font-semibold text-gray-700 mb-2 text-center">{t('game.loading')}</div>
         <LoadingSpinner size={35} />
       </div>
     );

@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import mapboxgl from 'mapbox-gl';
-import { getLocationInfo } from "@/lib/places";
 import { updateCircle } from "@/lib/shapes/circle";
+import { getLocationInfo } from "@/lib/places";
 import fetchWeatherData from "@/lib/weatherApi";
 import { getTrainLinesInArea, createBoundingBoxFromCenter, TrainLine, getPowerLinesInArea, PowerLine } from "@/lib/osmApi";
 import { drawTrainLines, drawPowerLines, removeInfrastructureLines } from "@/lib/shapes/lines";
@@ -16,7 +16,7 @@ export function useMapLogic() {
 
   const [coordinates, setCoordinates] = useState<{ lng: number; lat: number }>({ lng: 9, lat: 48 });
   const [locationInfo, setLocationInfo] = useState<{ street: string; city: string }>({ street: '', city: '' });
-  const [radius, setRadius] = useState<number>(2000);
+  const [radius, setRadius] = useState<number>(500);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [gameState, setGameState] = useState<'idle' | 'loading' | 'playing'>('idle');
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
@@ -49,6 +49,14 @@ export function useMapLogic() {
     getLocationInfo(lngLat.lng, lngLat.lat).then(setLocationInfo);
     updateCircle([lngLat.lng, lngLat.lat], radius, map, lastCircleParams);
     fetchWeatherData(roundedCoords.lat, roundedCoords.lng, setWeatherData, setWeatherLoading);
+  }, [radius]);
+
+  // Update circle when radius changes
+  useEffect(() => {
+    if (map.current && marker.current) {
+      const lngLat = marker.current.getLngLat();
+      updateCircle([lngLat.lng, lngLat.lat], radius, map, lastCircleParams);
+    }
   }, [radius]);
 
   // Handle filter toggles
