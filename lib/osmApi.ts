@@ -9,7 +9,7 @@ interface GenericLineProperties {
   id: number;
   name?: string;
   operator?: string;
-  [key: string]: any;
+  [key: string]: string | number | undefined;
 }
 
 interface GenericLineGeometry {
@@ -132,6 +132,8 @@ function processOverpassData<T extends LineType>(
 ): T extends 'railway' ? TrainLine[] : PowerLine[] {
   const lines: GenericLine[] = [];
   const nodeMap = new Map<number, { lat: number; lon: number }>();
+
+  console.log(`Processing ${data.elements.length} elements for ${lineType} lines...`);
 
   // First pass: collect all nodes
   data.elements.forEach(element => {

@@ -1,5 +1,4 @@
-import { TrainLine, PowerLine, GenericLine, LineType } from "@/lib/osmApi";
-import mapboxgl from 'mapbox-gl';
+import { TrainLine, PowerLine, LineType } from "@/lib/osmApi";
 import React from 'react';
 
 // Configuration for different line types
@@ -41,6 +40,9 @@ const LINE_STYLES = {
   }
 } as const;
 
+// Import mapboxgl types
+import mapboxgl from 'mapbox-gl';
+
 /**
  * Generic function to draw infrastructure lines on the map
  */
@@ -75,22 +77,22 @@ export function drawInfrastructureLines<T extends LineType>(
   });
 
   // Build color expression
-  const colorExpression = ['case'] as any;
+  const colorExpression: mapboxgl.Expression = ['case'] as mapboxgl.Expression;
   Object.entries(config.colors).forEach(([key, color]) => {
     if (key !== 'default') {
-      colorExpression.push(['==', ['get', config.tagKey], key], color);
+      (colorExpression as any[]).push(['==', ['get', config.tagKey], key], color);
     }
   });
-  colorExpression.push(config.colors.default);
+  (colorExpression as any[]).push(config.colors.default);
 
   // Build width expression
-  const widthExpression = ['case'] as any;
+  const widthExpression: mapboxgl.Expression = ['case'] as mapboxgl.Expression;
   Object.entries(config.widths).forEach(([key, width]) => {
     if (key !== 'default') {
-      widthExpression.push(['==', ['get', config.tagKey], key], width);
+      (widthExpression as any[]).push(['==', ['get', config.tagKey], key], width);
     }
   });
-  widthExpression.push(config.widths.default);
+  (widthExpression as any[]).push(config.widths.default);
 
   // Add lines layer
   map.current.addLayer({
@@ -111,14 +113,14 @@ export function drawInfrastructureLines<T extends LineType>(
   // Add click event listener
   map.current.on('click', config.layerId, (e) => {
     if (e.features && e.features[0]) {
-      const feature = e.features[0] as any;
+      const feature = e.features[0] as GeoJSON.Feature;
       const line = {
         type: 'Feature' as const,
         id: feature.id,
         properties: feature.properties,
         geometry: feature.geometry
       };
-      setSelectedLine(line as any);
+      setSelectedLine(line as T extends 'railway' ? TrainLine : PowerLine);
     }
   });
 

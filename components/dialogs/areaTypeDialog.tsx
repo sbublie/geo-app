@@ -40,7 +40,7 @@ export default function AreaTypeDialog({
                 <DialogHeader>
                     <DialogTitle>Select Area Type</DialogTitle>
                     <DialogDescription>
-                        Choose the type of area you've drawn to categorize it properly.
+                        Choose the type of area you&apos;ve drawn to categorize it properly.
                     </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">

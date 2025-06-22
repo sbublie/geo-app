@@ -96,6 +96,10 @@ export default function Home() {
       [pendingPolygon.index]: areaType
     }));
 
+    console.log(`Selected area type: ${areaType} for polygon index: ${pendingPolygon.index}`);
+    // Log the polygon points
+    console.log(`Polygon types:`, polygonTypes);
+
     // Add polygon to state and map
     setDrawnPolygons(prev => [...prev, pendingPolygon.points]);
     addCompletedPolygon(pendingPolygon.points, pendingPolygon.index, areaType, map, t);
@@ -161,7 +165,7 @@ export default function Home() {
     if (mapContainer.current) {
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
-        style: mapbox_style, // your custom style
+        style: mapbox_style as any, // your custom style
         center: [9, 48], // starting position [lng, lat]
         zoom: 13 // starting zoom
       });
@@ -277,7 +281,7 @@ export default function Home() {
     if (mapContainer.current) {
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
-        style: mapbox_style,
+        style: mapbox_style as any, 
         center: [9, 48],
         zoom: 13
       });
@@ -320,7 +324,7 @@ export default function Home() {
       });
     };
 
-    const handleMapDoubleClick = (e: mapboxgl.MapMouseEvent) => {
+    const handleMapDoubleClick = () => {
       if (!isDrawingMode || currentPolygon.length < 2) return;
 
       // Complete the polygon and show type selection
@@ -336,7 +340,7 @@ export default function Home() {
       setShowAreaTypeDialog(true);
     };
 
-    const handleMouseMove = (e: mapboxgl.MapMouseEvent) => {
+    const handleMouseMove = () => {
       if (!isDrawingMode) return;
 
       // Change cursor to crosshair when moving over the map in drawing mode
