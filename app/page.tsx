@@ -1,7 +1,5 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
-
 // Components
 import MapContainer from '@/components/map/mapContainer';
 import GameControls from '@/components/game/gameControls';
@@ -18,7 +16,6 @@ import { usePolygonDrawing } from '@/hooks/usePolygonDrawing';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 export default function Home() {
-  const t = useTranslations();
   
   const {
     coordinates,

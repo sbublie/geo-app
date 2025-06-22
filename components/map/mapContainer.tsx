@@ -16,8 +16,7 @@ export default function MapContainer({
   onMapLoad, 
   onMarkerDragEnd, 
   gameState, 
-  coordinates, 
-  radius 
+  coordinates
 }: MapContainerProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
