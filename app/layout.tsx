@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "GeoGame",
+  title: "GeoApp",
   description: "A game to explore geographical data",
 };
 

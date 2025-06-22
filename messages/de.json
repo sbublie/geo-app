@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "GeoGame",
+    "title": "GeoApp",
     "description": "Ziehen Sie den Marker an die gewünschte Katastrophenstelle."
   },
   "common": {
@@ -54,5 +54,11 @@
       "heli": "Landeplatz Helikopter",
       "rescue": "Rettungsmittelhalteplatz"
     }
+  },
+  "filters": {
+    "title": "Filter",
+    "mapElements": "Kartenelemente",
+    "trainLines": "Bahntrassen",
+    "powerLines": "Stromleitungen"
   }
 }
