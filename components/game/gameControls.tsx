@@ -7,7 +7,7 @@ import { LoadingSpinner } from "@/components/ui/spinner";
 import { useTranslations } from 'next-intl';
 
 interface GameControlsProps {
-  gameState: 'idle' | 'loading' | 'playing';
+  appState: 'idle' | 'loading' | 'playing';
   radius: number;
   setRadius: (radius: number) => void;
   onStartGame: () => void;
@@ -15,7 +15,7 @@ interface GameControlsProps {
 }
 
 export default function GameControls({
-  gameState,
+  appState,
   radius,
   setRadius,
   onStartGame,
@@ -23,7 +23,7 @@ export default function GameControls({
 }: GameControlsProps) {
   const t = useTranslations();
 
-  if (gameState === 'idle') {
+  if (appState === 'idle') {
     // Wrap both cards in a fragment so they stack in the flex column
     return (
       <>
@@ -62,7 +62,7 @@ export default function GameControls({
     );
   }
 
-  if (gameState === 'loading') {
+  if (appState === 'loading') {
     return (
       <div className="flex flex-col items-center justify-center bg-white bg-opacity-90 p-4 rounded-lg shadow-lg border w-[370px]">
         <div className="text-xl font-semibold text-gray-700 mb-2 text-center">{t('game.loading')}</div>
@@ -71,7 +71,7 @@ export default function GameControls({
     );
   }
 
-  if (gameState === 'playing') {
+  if (appState === 'playing') {
     return (
       <div className="bg-white bg-opacity-90 p-3 rounded-lg shadow-lg border max-w-[370px]">
         <div className="text-lg font-semibold text-gray-700 mb-2">{t('game.active')}</div>

@@ -149,6 +149,7 @@ export function usePolygonDrawing(map: React.MutableRefObject<mapboxgl.Map | nul
 
   return {
     isDrawingMode,
+    setIsDrawingMode,
     currentPolygon,
     drawnPolygons,
     showAreaTypeDialog,

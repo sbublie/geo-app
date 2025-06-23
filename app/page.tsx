@@ -22,7 +22,7 @@ export default function Home() {
     locationInfo,
     radius,
     setRadius,
-    gameState,
+    appState,
     weatherData,
     weatherLoading,
     showTrainLines,
@@ -49,8 +49,16 @@ export default function Home() {
     pendingPolygon,
     toggleDrawingMode,
     handleAreaTypeSelect,
-    clearAllPolygons
+    clearAllPolygons,
+    setIsDrawingMode,
   } = usePolygonDrawing(map);
+
+  // Combine both resets
+  const handleResetGame = () => {
+    resetGame();
+    clearAllPolygons();
+    setIsDrawingMode(false); // <-- deactivate drawing mode
+  };
 
   const getWindDirectionText = (degrees: number) => {
     const directions = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
@@ -63,14 +71,14 @@ export default function Home() {
       <MapContainer
         onMapLoad={handleMapLoad}
         onMarkerDragEnd={handleMarkerDragEnd}
-        gameState={gameState}
+        appState={appState}
         coordinates={coordinates}
         radius={radius}
         markerRef={marker}
       />
 
       {/* Filter Menu */}
-      {gameState === 'playing' && (
+      {appState === 'playing' && (
         <div className="absolute top-4 left-4 z-10">
           <FilterMenu
             showTrainLines={showTrainLines}
@@ -85,15 +93,15 @@ export default function Home() {
       <div className="absolute top-4 right-4 flex flex-col gap-4 z-10">
         {/* Game Controls */}
         <GameControls
-          gameState={gameState}
+          appState={appState}
           radius={radius}
           setRadius={setRadius}
           onStartGame={startGame}
-          onResetGame={resetGame}
+          onResetGame={handleResetGame}
         />
 
         {/* Drawing Controls - only show when playing */}
-        {gameState === 'playing' && (
+        {appState === 'playing' && (
           <DrawingControls
             isDrawingMode={isDrawingMode}
             currentPolygonLength={currentPolygon.length}

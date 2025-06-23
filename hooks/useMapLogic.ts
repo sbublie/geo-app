@@ -8,17 +8,21 @@ import fetchWeatherData from "@/lib/weatherApi";
 import { getTrainLinesInArea, createBoundingBoxFromCenter, TrainLine, getPowerLinesInArea, PowerLine } from "@/lib/osmApi";
 import { drawTrainLines, drawPowerLines, removeInfrastructureLines } from "@/lib/shapes/lines";
 import WeatherData from '@/types/weatherData';
+import { usePolygonDrawing } from '@/hooks/usePolygonDrawing';
+
 
 export function useMapLogic() {
   const map = useRef<mapboxgl.Map | null>(null);
   const marker = useRef<mapboxgl.Marker | null>(null);
   const lastCircleParams = useRef<{ center: [number, number]; radius: number } | null>(null);
+  const defaultLocation: [number, number] = [8.79053, 47.99143]; // Default coordinates for the map center
+  const { clearAllPolygons } = usePolygonDrawing(map);
 
-  const [coordinates, setCoordinates] = useState<{ lng: number; lat: number }>({ lng: 9, lat: 48 });
+  const [coordinates, setCoordinates] = useState<{ lng: number; lat: number }>({ lng: defaultLocation[0], lat: defaultLocation[1] });
   const [locationInfo, setLocationInfo] = useState<{ street: string; city: string }>({ street: '', city: '' });
   const [radius, setRadius] = useState<number>(500);
   const [mapLoaded, setMapLoaded] = useState(false);
-  const [gameState, setGameState] = useState<'idle' | 'loading' | 'playing'>('idle');
+  const [appState, setGameState] = useState<'idle' | 'loading' | 'playing'>('idle');
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [weatherLoading, setWeatherLoading] = useState(false);
   const [selectedTrainLine, setSelectedTrainLine] = useState<TrainLine | null>(null);
@@ -34,9 +38,9 @@ export function useMapLogic() {
     map.current = mapRef.current;
     
     // Initial setup
-    getLocationInfo(9, 48).then(setLocationInfo);
-    updateCircle([9, 48], radius, map, lastCircleParams);
-    fetchWeatherData(9, 48, setWeatherData, setWeatherLoading);
+    getLocationInfo(defaultLocation[0], defaultLocation[1]).then(setLocationInfo);
+    updateCircle(defaultLocation, radius, map, lastCircleParams);
+    fetchWeatherData(defaultLocation[0], defaultLocation[1], setWeatherData, setWeatherLoading);
     setMapLoaded(true);
   }, [radius]);
 
@@ -112,7 +116,9 @@ export function useMapLogic() {
     removeInfrastructureLines('railway', map);
     setTrainLinesData([]);
     setPowerLinesData([]);
-  }, []);
+    // Clear all polygons on reset
+    clearAllPolygons();
+  }, [map, clearAllPolygons]);
 
   return {
     // State
@@ -121,7 +127,7 @@ export function useMapLogic() {
     radius,
     setRadius,
     mapLoaded,
-    gameState,
+    appState,
     weatherData,
     weatherLoading,
     showTrainLines,

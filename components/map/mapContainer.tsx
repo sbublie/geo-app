@@ -4,10 +4,12 @@ import { useRef, useEffect } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { mapbox_style } from "@/components/mapbox_style";
 
+const defaultLocation: [number, number] = [8.79053, 47.99143]; // Default coordinates for the map center
+
 interface MapContainerProps {
   onMapLoad: (map: React.MutableRefObject<mapboxgl.Map | null>) => void;
   onMarkerDragEnd: (lngLat: mapboxgl.LngLat) => void;
-  gameState: 'idle' | 'loading' | 'playing';
+  appState: 'idle' | 'loading' | 'playing';
   coordinates: { lng: number; lat: number };
   radius: number;
   markerRef: React.MutableRefObject<mapboxgl.Marker | null>;
@@ -16,7 +18,7 @@ interface MapContainerProps {
 export default function MapContainer({ 
   onMapLoad, 
   onMarkerDragEnd, 
-  gameState, 
+  appState, 
   coordinates,
   markerRef
 }: MapContainerProps) {
@@ -32,7 +34,7 @@ export default function MapContainer({
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
         style: mapbox_style as any,
-        center: [9, 48],
+        center: defaultLocation,
         zoom: 13
       });
 
@@ -41,7 +43,7 @@ export default function MapContainer({
           draggable: true,
           color: '#ff0000'
         })
-          .setLngLat([9, 48])
+          .setLngLat(defaultLocation)
           .addTo(map.current!);
 
         markerRef.current.on('dragend', () => {
@@ -58,7 +60,7 @@ export default function MapContainer({
   useEffect(() => {
     if (!markerRef.current) return;
 
-    const isDraggable = gameState !== 'playing';
+    const isDraggable = appState !== 'playing';
     markerRef.current.setDraggable(isDraggable);
     markerRef.current.setLngLat([coordinates.lng, coordinates.lat]);
 
@@ -70,7 +72,7 @@ export default function MapContainer({
         path.setAttribute('fill', isDraggable ? '#ff0000' : '#666666');
       }
     }
-  }, [gameState, coordinates, markerRef]);
+  }, [appState, coordinates, markerRef]);
 
   return <div ref={mapContainer} className="w-full h-full" />;
 }
