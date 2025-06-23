@@ -56,6 +56,24 @@
       "rescue": "Rettungsmittelhalteplatz"
     }
   },
+  "osm": {
+    "lines": {
+      "train": {
+        "title": "Bahntrasse",
+        "service": "Bahnservice",
+        "electrified": "Elektrifizierung",
+        "maxspeed": "Maximale Geschwindigkeit",
+        "maxspeedBackward": "Maximale Geschwindigkeit (Rückwärts)",
+        "maxspeedForward": "Maximale Geschwindigkeit (Vorwärts)",
+        "operator": "Betrieber"
+      },
+      "power": {
+        "title": "Stromleitung",
+        "voltage": "Spannung",
+        "operator": "Betrieber"
+      }
+    }
+  },
   "filters": {
     "title": "Filter",
     "mapElements": "Kartenelemente",

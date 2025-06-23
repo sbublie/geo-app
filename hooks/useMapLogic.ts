@@ -6,7 +6,7 @@ import { updateCircle } from "@/lib/shapes/circle";
 import { getLocationInfo } from "@/lib/places";
 import fetchWeatherData from "@/lib/weatherApi";
 import { getTrainLinesInArea, createBoundingBoxFromCenter, TrainLine, getPowerLinesInArea, PowerLine } from "@/lib/osmApi";
-import { drawTrainLines, drawPowerLines, removeInfrastructureLines } from "@/lib/shapes/lines";
+import { drawLines, removeLines, LINE_STYLES, GenericLineFeature } from "@/lib/shapes/lines";
 import WeatherData from '@/types/weatherData';
 import { usePolygonDrawing } from '@/hooks/usePolygonDrawing';
 
@@ -25,8 +25,7 @@ export function useMapLogic() {
   const [appState, setGameState] = useState<'idle' | 'loading' | 'playing'>('idle');
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [weatherLoading, setWeatherLoading] = useState(false);
-  const [selectedTrainLine, setSelectedTrainLine] = useState<TrainLine | null>(null);
-  const [selectedPowerLine, setSelectedPowerLine] = useState<PowerLine | null>(null);
+  const [selectedLine, setSelectedLine] = useState<GenericLineFeature | null>(null);
   
   // Filter states
   const [showTrainLines, setShowTrainLines] = useState(true);
@@ -67,20 +66,20 @@ export function useMapLogic() {
   const handleToggleTrainLines = useCallback((show: boolean) => {
     setShowTrainLines(show);
     if (show && trainLinesData.length > 0) {
-      drawTrainLines(trainLinesData, map, setSelectedTrainLine);
+      drawLines(trainLinesData, "railway", map, setSelectedLine);
     } else {
-      removeInfrastructureLines('railway', map);
-      setSelectedTrainLine(null);
+      removeLines("railway", map);
+      setSelectedLine(null);
     }
   }, [trainLinesData]);
 
   const handleTogglePowerLines = useCallback((show: boolean) => {
     setShowPowerLines(show);
     if (show && powerLinesData.length > 0) {
-      drawPowerLines(powerLinesData, map, setSelectedPowerLine);
+      drawLines(powerLinesData, "power", map, setSelectedLine);
     } else {
-      removeInfrastructureLines('power', map);
-      setSelectedPowerLine(null);
+      removeLines("power", map);
+      setSelectedLine(null);
     }
   }, [powerLinesData]);
 
@@ -95,10 +94,10 @@ export function useMapLogic() {
       setPowerLinesData(powerLines);
 
       if (showTrainLines) {
-        drawTrainLines(trainLines, map, setSelectedTrainLine);
+        drawLines(trainLines, "railway", map, setSelectedLine);
       }
       if (showPowerLines) {
-        drawPowerLines(powerLines, map, setSelectedPowerLine);
+        drawLines(powerLines, "power", map, setSelectedLine);
       }
 
       setGameState('playing');
@@ -110,10 +109,9 @@ export function useMapLogic() {
 
   const resetGame = useCallback(() => {
     setGameState('idle');
-    setSelectedTrainLine(null);
-    setSelectedPowerLine(null);
-    removeInfrastructureLines('power', map);
-    removeInfrastructureLines('railway', map);
+    setSelectedLine(null);
+    removeLines("power", map);
+    removeLines("railway", map);
     setTrainLinesData([]);
     setPowerLinesData([]);
     // Clear all polygons on reset
@@ -134,10 +132,8 @@ export function useMapLogic() {
     showPowerLines,
     trainLinesData,
     powerLinesData,
-    selectedTrainLine,
-    selectedPowerLine,
-    setSelectedTrainLine,
-    setSelectedPowerLine,
+    selectedLine,
+    setSelectedLine,
     // Handlers
     handleMapLoad,
     handleMarkerDragEnd,

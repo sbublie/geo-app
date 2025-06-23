@@ -9,6 +9,7 @@ import FilterMenu from "@/components/map/filterMenu";
 import LineDetailsDialog from "@/components/map/LineDetailsDialog";
 import AreaTypeDialog from "@/components/dialogs/areaTypeDialog";
 import { getWindDirectionText } from "@/lib/weatherApi";
+import { GenericLineFeature } from "@/lib/shapes/lines";
 
 // Hooks
 import { useMapLogic } from "@/hooks/useMapLogic";
@@ -27,10 +28,8 @@ export default function Home() {
     weatherLoading,
     showTrainLines,
     showPowerLines,
-    selectedTrainLine,
-    selectedPowerLine,
-    setSelectedTrainLine,
-    setSelectedPowerLine,
+    selectedLine,
+    setSelectedLine,
     handleMapLoad,
     handleMarkerDragEnd,
     startGame,
@@ -60,7 +59,11 @@ export default function Home() {
     setIsDrawingMode(false);
   };
 
-
+  const getLineType = (line: GenericLineFeature): "train" | "power" => {
+    if (line.properties?.railway) return "train";
+    if (line.properties?.power) return "power";
+    return "train"; // fallback
+  };
 
   return (
     <div className="w-full h-screen relative">
@@ -118,22 +121,12 @@ export default function Home() {
       />
 
       {/* Detail Popups */}
-      {selectedTrainLine && (
+      {selectedLine && (
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
           <LineDetailsDialog
-            line={selectedTrainLine}
-            type="train"
-            onClose={() => setSelectedTrainLine(null)}
-          />
-        </div>
-      )}
-
-      {selectedPowerLine && (
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
-          <LineDetailsDialog
-            line={selectedPowerLine}
-            type="power"
-            onClose={() => setSelectedPowerLine(null)}
+            line={selectedLine}
+            type={getLineType(selectedLine)}
+            onClose={() => setSelectedLine(null)}
           />
         </div>
       )}
