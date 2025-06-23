@@ -1,5 +1,28 @@
 import WeatherData from "@/types/weatherData";
 
+  export const getWindDirectionText = (degrees: number) => {
+    const directions = [
+      "N",
+      "NNE",
+      "NE",
+      "ENE",
+      "E",
+      "ESE",
+      "SE",
+      "SSE",
+      "S",
+      "SSW",
+      "SW",
+      "WSW",
+      "W",
+      "WNW",
+      "NW",
+      "NNW",
+    ];
+    const index = Math.round(degrees / 22.5) % 16;
+    return directions[index];
+  };
+
 export default async function fetchWeatherData(lat: number, lng: number, setWeatherData: React.Dispatch<React.SetStateAction<WeatherData | null>>, setWeatherLoading: React.Dispatch<React.SetStateAction<boolean>>): Promise<void> {
   setWeatherLoading(true);
   try {

@@ -8,6 +8,7 @@ import InfoPanels from "@/components/info/infoPanels";
 import FilterMenu from "@/components/map/filterMenu";
 import LineDetailsDialog from "@/components/map/LineDetailsDialog";
 import AreaTypeDialog from "@/components/dialogs/areaTypeDialog";
+import { getWindDirectionText } from "@/lib/weatherApi";
 
 // Hooks
 import { useMapLogic } from "@/hooks/useMapLogic";
@@ -59,28 +60,7 @@ export default function Home() {
     setIsDrawingMode(false);
   };
 
-  const getWindDirectionText = (degrees: number) => {
-    const directions = [
-      "N",
-      "NNE",
-      "NE",
-      "ENE",
-      "E",
-      "ESE",
-      "SE",
-      "SSE",
-      "S",
-      "SSW",
-      "SW",
-      "WSW",
-      "W",
-      "WNW",
-      "NW",
-      "NNW",
-    ];
-    const index = Math.round(degrees / 22.5) % 16;
-    return directions[index];
-  };
+
 
   return (
     <div className="w-full h-screen relative">
