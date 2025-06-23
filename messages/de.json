@@ -71,6 +71,33 @@
         "title": "Stromleitung",
         "voltage": "Spannung",
         "operator": "Betrieber"
+      },
+      "aeroway": {
+        "title": "Luftlinie",
+        "surface": "Oberfläche",
+        "width": "Breite",
+        "ref": "Referenz"
+      },
+      "pipeline": {
+        "title": "Pipeline",
+        "substance": "Substanz",
+        "diameter": "Durchmesser",
+        "pressure": "Druck",
+        "location": "Lage"
+      },
+      "waterway": {
+        "title": "Wasserweg",
+        "width": "Breite",
+        "depth": "Tiefe",
+        "boat": "Bootsverkehr",
+        "intermittent": "Intermittierend"
+      },
+      "highway": {
+        "title": "Straße",
+        "maxspeed": "Maximale Geschwindigkeit",
+        "lanes": "Spuren",
+        "surface": "Oberfläche",
+        "ref": "Referenz"
       }
     }
   },
@@ -78,6 +105,11 @@
     "title": "Filter",
     "mapElements": "Kartenelemente",
     "trainLines": "Bahntrassen",
-    "powerLines": "Stromleitungen"
+    "powerLines": "Stromleitungen",
+    "aerowayLines": "Luftlinie",
+    "pipelineLines": "Pipeline",
+    "waterwayLines": "Wasserwege",
+    "railwayLines": "Eisenbahnlinien",
+    "highwayLines": "Straßen"
   }
 }

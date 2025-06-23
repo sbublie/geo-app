@@ -38,26 +38,7 @@ export default function GameControls({
             </Button>
           </div>
         </div>
-        <div className="bg-white bg-opacity-90 p-4 rounded-lg shadow-lg border max-w-[370px]">
-          <div className="space-y-3">
-            <Label htmlFor="radius-slider" className="text-sm font-semibold text-gray-700">
-              {t('common.radius')}: {radius}m
-            </Label>
-            <Slider
-              id="radius-slider"
-              min={100}
-              max={2000}
-              step={50}
-              value={[radius]}
-              onValueChange={(value) => setRadius(value[0])}
-              className="w-full"
-            />
-            <div className="flex justify-between text-xs text-gray-500">
-              <span>100m</span>
-              <span>2000m</span>
-            </div>
-          </div>
-        </div>
+        
       </>
     );
   }

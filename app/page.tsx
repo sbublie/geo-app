@@ -10,6 +10,7 @@ import LineDetailsDialog from "@/components/map/LineDetailsDialog";
 import AreaTypeDialog from "@/components/dialogs/areaTypeDialog";
 import { getWindDirectionText } from "@/lib/weatherApi";
 import { GenericLineFeature } from "@/lib/shapes/lines";
+import { LineTypeKey, LINE_CONFIGS } from "@/lib/osmApi";
 
 // Hooks
 import { useMapLogic } from "@/hooks/useMapLogic";
@@ -26,16 +27,16 @@ export default function Home() {
     appState,
     weatherData,
     weatherLoading,
-    showTrainLines,
-    showPowerLines,
     selectedLine,
     setSelectedLine,
+    lineVisibility,
+    enabledLineTypes,
     handleMapLoad,
     handleMarkerDragEnd,
     startGame,
     resetGame,
-    handleToggleTrainLines,
-    handleTogglePowerLines,
+    handleToggleLineType,
+    getSelectedLineType,
     map,
     marker,
   } = useMapLogic();
@@ -59,10 +60,12 @@ export default function Home() {
     setIsDrawingMode(false);
   };
 
-  const getLineType = (line: GenericLineFeature): "train" | "power" => {
-    if (line.properties?.railway) return "train";
-    if (line.properties?.power) return "power";
-    return "train"; // fallback
+  // Get line type from selected line using the generic helper
+  const getLineTypeForDialog = (line: GenericLineFeature): "train" | "power" | "highway" | "waterway" | "pipeline" | "aeroway" => {
+    const lineType = getSelectedLineType(line);
+    // Map railway to train for dialog compatibility
+    if (lineType === 'railway') return 'train';
+    return lineType || 'train';
   };
 
   return (
@@ -80,10 +83,9 @@ export default function Home() {
       {appState === "playing" && (
         <div className="absolute top-4 left-4 z-10">
           <FilterMenu
-            showTrainLines={showTrainLines}
-            showPowerLines={showPowerLines}
-            onToggleTrainLines={handleToggleTrainLines}
-            onTogglePowerLines={handleTogglePowerLines}
+            lineVisibility={lineVisibility}
+            enabledLineTypes={enabledLineTypes}
+            onToggleLineType={handleToggleLineType}
           />
         </div>
       )}
@@ -125,7 +127,7 @@ export default function Home() {
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
           <LineDetailsDialog
             line={selectedLine}
-            type={getLineType(selectedLine)}
+            type={getLineTypeForDialog(selectedLine)}
             onClose={() => setSelectedLine(null)}
           />
         </div>
