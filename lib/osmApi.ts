@@ -84,7 +84,7 @@ export async function getInfrastructureLinesInArea<T extends LineType>(
     }
 
     const data: OverpassResponse = await response.json();
-    return processOverpassData(data, lineType) as GenericLine[];
+    return processOverpassData(data) as GenericLine[];
   } catch (error) {
     console.error(`Error fetching ${lineType} lines:`, error);
     throw new Error(`Failed to fetch ${lineType} lines: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -94,9 +94,8 @@ export async function getInfrastructureLinesInArea<T extends LineType>(
 /**
  * Processes raw Overpass API response data into GeoJSON-like features
  */
-function processOverpassData<T extends LineType>(
+function processOverpassData(
   data: OverpassResponse,
-  lineType: T
 ): GenericLine[] {
   const lines: GenericLine[] = [];
   const nodeMap = new Map<number, { lat: number; lon: number }>();

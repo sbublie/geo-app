@@ -10,9 +10,10 @@ interface LineDetailsDialogProps {
 }
 
 export default function LineDetailsDialog({ line, type, onClose }: LineDetailsDialogProps) {
-  if (!line) return null;
-
   const t = useTranslations("osm.lines");
+
+  if (!line) return null;
+  
   const properties = line.properties || {};
   const config = LINE_CONFIGS[type];
   const highlightFields = config.highlightFields || [];

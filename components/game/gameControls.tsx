@@ -1,8 +1,6 @@
 'use client';
 
 import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
-import { Label } from "@/components/ui/label";
 import { LoadingSpinner } from "@/components/ui/spinner";
 import { useTranslations } from 'next-intl';
 
@@ -16,8 +14,6 @@ interface GameControlsProps {
 
 export default function GameControls({
   appState,
-  radius,
-  setRadius,
   onStartGame,
   onResetGame
 }: GameControlsProps) {
