@@ -25,16 +25,16 @@ const LINE_STYLES = {
     layerId: 'power-lines-layer',
     sourceId: 'power-lines',
     colors: {
-      'line': '#dc2626',           // Red for transmission lines
-      'cable': '#f59e0b',          // Amber for cables
-      'minor_line': '#16a34a',     // Green for minor lines
-      'default': '#6b7280'         // Gray for others
+      'line': '#dc2626',           
+      'cable': '#dc2626',          
+      'minor_line': '#dc2626',     
+      'default': '#dc2626'         
     },
     widths: {
       'line': 4,                   // Thicker for major transmission
       'cable': 2,
-      'minor_line': 1,
-      'default': 1
+      'minor_line': 2,
+      'default': 2
     },
     tagKey: 'power'
   }

@@ -1,22 +1,21 @@
-'use client';
+"use client";
 
 // Components
-import MapContainer from '@/components/map/mapContainer';
-import GameControls from '@/components/game/gameControls';
-import DrawingControls from '@/components/drawing/drawingControls';
-import InfoPanels from '@/components/info/infoPanels';
-import FilterMenu from '@/components/map/filterMenu';
-import { TrainLineDetails, PowerLineDetails } from "@/components/map/details";
+import MapContainer from "@/components/map/mapContainer";
+import GameControls from "@/components/game/gameControls";
+import DrawingControls from "@/components/drawing/drawingControls";
+import InfoPanels from "@/components/info/infoPanels";
+import FilterMenu from "@/components/map/filterMenu";
+import LineDetailsDialog from "@/components/map/LineDetailsDialog";
 import AreaTypeDialog from "@/components/dialogs/areaTypeDialog";
 
 // Hooks
-import { useMapLogic } from '@/hooks/useMapLogic';
-import { usePolygonDrawing } from '@/hooks/usePolygonDrawing';
+import { useMapLogic } from "@/hooks/useMapLogic";
+import { usePolygonDrawing } from "@/hooks/usePolygonDrawing";
 
-import 'mapbox-gl/dist/mapbox-gl.css';
+import "mapbox-gl/dist/mapbox-gl.css";
 
 export default function Home() {
-  
   const {
     coordinates,
     locationInfo,
@@ -61,7 +60,24 @@ export default function Home() {
   };
 
   const getWindDirectionText = (degrees: number) => {
-    const directions = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+    const directions = [
+      "N",
+      "NNE",
+      "NE",
+      "ENE",
+      "E",
+      "ESE",
+      "SE",
+      "SSE",
+      "S",
+      "SSW",
+      "SW",
+      "WSW",
+      "W",
+      "WNW",
+      "NW",
+      "NNW",
+    ];
     const index = Math.round(degrees / 22.5) % 16;
     return directions[index];
   };
@@ -78,7 +94,7 @@ export default function Home() {
       />
 
       {/* Filter Menu */}
-      {appState === 'playing' && (
+      {appState === "playing" && (
         <div className="absolute top-4 left-4 z-10">
           <FilterMenu
             showTrainLines={showTrainLines}
@@ -101,7 +117,7 @@ export default function Home() {
         />
 
         {/* Drawing Controls - only show when playing */}
-        {appState === 'playing' && (
+        {appState === "playing" && (
           <DrawingControls
             isDrawingMode={isDrawingMode}
             currentPolygonLength={currentPolygon.length}
@@ -124,8 +140,9 @@ export default function Home() {
       {/* Detail Popups */}
       {selectedTrainLine && (
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
-          <TrainLineDetails
-            trainLine={selectedTrainLine}
+          <LineDetailsDialog
+            line={selectedTrainLine}
+            type="train"
             onClose={() => setSelectedTrainLine(null)}
           />
         </div>
@@ -133,8 +150,9 @@ export default function Home() {
 
       {selectedPowerLine && (
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
-          <PowerLineDetails
-            powerLine={selectedPowerLine}
+          <LineDetailsDialog
+            line={selectedPowerLine}
+            type="power"
             onClose={() => setSelectedPowerLine(null)}
           />
         </div>
