@@ -38,9 +38,10 @@
     "lng": "Längengrad"
   },
   "areas": {
-    "selectType": "Bereichstyp auswählen",
+    "selectType": "Typ der Fläche auswählen",
     "selectDescription": "Wählen Sie den Typ des gezeichneten Bereichs zur ordnungsgemäßen Kategorisierung.",
-    "polygonArea": "Polygonfläche",
+    "polygonArea": "Fläche",
+    "polygonType": "Typ der Fläche",
     "types": {
       "keep_free": "Freihalten",
       "red": "Behandlungsplatz Rot",

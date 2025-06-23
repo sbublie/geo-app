@@ -57,7 +57,7 @@ export default function Home() {
   const handleResetGame = () => {
     resetGame();
     clearAllPolygons();
-    setIsDrawingMode(false); // <-- deactivate drawing mode
+    setIsDrawingMode(false);
   };
 
   const getWindDirectionText = (degrees: number) => {

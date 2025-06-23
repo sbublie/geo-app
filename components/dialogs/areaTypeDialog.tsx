@@ -38,15 +38,15 @@ export default function AreaTypeDialog({
         <Dialog open={showAreaTypeDialog} onOpenChange={setShowAreaTypeDialog}>
             <DialogContent className="sm:max-w-[500px] max-h-[80vh] overflow-hidden">
                 <DialogHeader>
-                    <DialogTitle>Select Area Type</DialogTitle>
+                    <DialogTitle>{t("areas.selectType")}</DialogTitle>
                     <DialogDescription>
-                        Choose the type of area you&apos;ve drawn to categorize it properly.
+                        {t("areas.selectDescription")}
                     </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
                     {pendingPolygon && (
                         <div className="text-sm text-gray-600 bg-gray-50 rounded-lg">
-                            <strong>Polygon area:</strong> {(() => {
+                            <strong>{t("areas.polygonArea")}</strong> {(() => {
                                 const closedPoints = [...pendingPolygon.points, pendingPolygon.points[0]];
                                 const polygonData = {
                                     type: 'Feature' as const,
@@ -66,7 +66,7 @@ export default function AreaTypeDialog({
                     )}
                     
                     <div className="space-y-2">
-                        <label className="text-sm font-medium">Area Type</label>
+                        <label className="text-sm font-medium">{t("areas.polygonType")}</label>
                         <div className="border rounded-lg p-2 max-h-[300px] overflow-y-auto">
                             <div className="grid gap-1">
                                 {AreaTypes.map((type) => (
