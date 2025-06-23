@@ -9,8 +9,6 @@ import FilterMenu from "@/components/map/filterMenu";
 import LineDetailsDialog from "@/components/map/LineDetailsDialog";
 import AreaTypeDialog from "@/components/dialogs/areaTypeDialog";
 import { getWindDirectionText } from "@/lib/weatherApi";
-import { GenericLineFeature } from "@/lib/shapes/lines";
-import { LineTypeKey, LINE_CONFIGS } from "@/lib/osmApi";
 
 // Hooks
 import { useMapLogic } from "@/hooks/useMapLogic";
@@ -58,14 +56,6 @@ export default function Home() {
     resetGame();
     clearAllPolygons();
     setIsDrawingMode(false);
-  };
-
-  // Get line type from selected line using the generic helper
-  const getLineTypeForDialog = (line: GenericLineFeature): "train" | "power" | "highway" | "waterway" | "pipeline" | "aeroway" => {
-    const lineType = getSelectedLineType(line);
-    // Map railway to train for dialog compatibility
-    if (lineType === 'railway') return 'train';
-    return lineType || 'train';
   };
 
   return (
@@ -127,7 +117,7 @@ export default function Home() {
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
           <LineDetailsDialog
             line={selectedLine}
-            type={getLineTypeForDialog(selectedLine)}
+            type={getSelectedLineType(selectedLine)}
             onClose={() => setSelectedLine(null)}
           />
         </div>

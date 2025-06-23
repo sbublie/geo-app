@@ -58,28 +58,25 @@
   },
   "osm": {
     "lines": {
-      "train": {
+      "railway": {
         "title": "Bahntrasse",
+        "type": "Typ",
         "service": "Bahnservice",
         "electrified": "Elektrifizierung",
-        "maxspeed": "Maximale Geschwindigkeit",
-        "maxspeedBackward": "Maximale Geschwindigkeit (Rückwärts)",
-        "maxspeedForward": "Maximale Geschwindigkeit (Vorwärts)",
+        "maxspeed": "Max. Geschwindigkeit",
+        "maxspeedBackward": "Max. Geschwindigkeit (Rückwärts)",
+        "maxspeedForward": "Max. Geschwindigkeit (Vorwärts)",
         "operator": "Betrieber"
       },
       "power": {
         "title": "Stromleitung",
+        "type": "Typ",
         "voltage": "Spannung",
         "operator": "Betrieber"
       },
-      "aeroway": {
-        "title": "Luftlinie",
-        "surface": "Oberfläche",
-        "width": "Breite",
-        "ref": "Referenz"
-      },
       "pipeline": {
         "title": "Pipeline",
+        "type": "Typ",
         "substance": "Substanz",
         "diameter": "Durchmesser",
         "pressure": "Druck",
@@ -87,6 +84,7 @@
       },
       "waterway": {
         "title": "Wasserweg",
+        "type": "Typ",
         "width": "Breite",
         "depth": "Tiefe",
         "boat": "Bootsverkehr",
@@ -94,7 +92,8 @@
       },
       "highway": {
         "title": "Straße",
-        "maxspeed": "Maximale Geschwindigkeit",
+        "type": "Typ",
+        "maxspeed": "Max. Geschwindigkeit",
         "lanes": "Spuren",
         "surface": "Oberfläche",
         "ref": "Referenz"
