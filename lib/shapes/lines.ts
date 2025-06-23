@@ -1,13 +1,13 @@
 import mapboxgl from 'mapbox-gl';
 import React from 'react';
-import { LINE_CONFIGS } from '@/types/LineConfig';
+import { lineConfig } from '@/lib/config/lineConfig';
 
 // Define a generic interface for line features
 export interface GenericLineFeature extends GeoJSON.Feature {
   properties: Record<string, any>;
 }
 
-export type LineTypeKey = keyof typeof LINE_CONFIGS;
+export type LineTypeKey = keyof typeof lineConfig;
 
 /**
  * Draw any type of infrastructure lines on the map
@@ -20,7 +20,7 @@ export function drawLines(
 ) {
   if (!map.current) return;
 
-  const config = LINE_CONFIGS[lineType];
+  const config = lineConfig[lineType];
 
   // Create GeoJSON FeatureCollection
   const geojsonData = {
@@ -106,7 +106,7 @@ export function removeLines(
 ) {
   if (!map.current) return;
 
-  const config = LINE_CONFIGS[lineType];
+  const config = lineConfig[lineType];
 
   if (map.current.getLayer(config.layerId)) {
     map.current.removeLayer(config.layerId);

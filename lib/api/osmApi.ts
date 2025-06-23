@@ -1,49 +1,8 @@
-import { LINE_CONFIGS, LineType, LineConfig } from '@/types/LineConfig'; 
-
-interface BoundingBox {
-  south: number;
-  west: number;
-  north: number;
-  east: number;
-}
-
-interface GenericLineProperties {
-  id: number;
-  name?: string;
-  operator?: string;
-  [key: string]: string | number | undefined;
-}
-
-interface GenericLineGeometry {
-  type: 'LineString';
-  coordinates: number[][];
-}
-
-interface GenericLine {
-  type: 'Feature';
-  id: number;
-  properties: GenericLineProperties;
-  geometry: GenericLineGeometry;
-}
-
-interface OverpassResponse {
-  version: number;
-  generator: string;
-  elements: Array<{
-    type: string;
-    id: number;
-    nodes?: number[];
-    tags?: { [key: string]: string };
-    lat?: number;
-    lon?: number;
-    geometry?: Array<{
-      lat: number;
-      lon: number;
-    }>;
-  }>;
-}
-
-
+import { LineType } from '@/types/LineConfig'; 
+import { lineConfig } from '@/lib/config/lineConfig';
+import GenericLine from '@/types/GenericLine'; // Assuming you have a GenericLine type defined
+import OverpassResponse from '@/types/OverpassResponse'; // Assuming you have an OverpassResponse type defined
+import BoundingBox from '@/types/BoundingBox'; // Assuming you have a BoundingBox type defined
 
 /**
  * Generic function to fetch infrastructure lines in a specified bounding box area using the OSM Overpass API
@@ -54,7 +13,7 @@ export async function getInfrastructureLinesInArea<T extends LineType>(
   overpassUrl: string = 'https://overpass-api.de/api/interpreter'
 ): Promise<GenericLine[]> {
   const { south, west, north, east } = boundingBox;
-  const config = LINE_CONFIGS[lineType];
+  const config = lineConfig[lineType];
   
   if (!config) {
     throw new Error(`Unsupported line type: ${lineType}`);
@@ -153,15 +112,3 @@ export function createBoundingBoxFromCenter(lat: number, lon: number, radiusKm: 
   };
 }
 
-/**
- * Get all available line type configurations
- */
-export function getAvailableLineTypes(): Array<{ key: LineType; config: LineConfig }> {
-  return Object.entries(LINE_CONFIGS).map(([key, config]) => ({
-    key: key as LineType,
-    config
-  }));
-}
-
-// Export types
-export type { BoundingBox, GenericLine, LineConfig };

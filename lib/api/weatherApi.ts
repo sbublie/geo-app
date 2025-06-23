@@ -1,4 +1,4 @@
-import WeatherData from "@/types/weatherData";
+import WeatherData from "@/types/WeatherData";
 
   export const getWindDirectionText = (degrees: number) => {
     const directions = [

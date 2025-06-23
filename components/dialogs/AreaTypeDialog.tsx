@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from '@/components/ui/button';
 import * as turf from '@turf/turf';
 
-import { getAreaTypes } from '@/types/areas';
+import { areaTypes } from '@/lib/config/areaTypes';
 import { useTranslations } from 'next-intl';
 
 export default function AreaTypeDialog({
@@ -20,7 +20,6 @@ export default function AreaTypeDialog({
 }) {
     const t = useTranslations();
     const [selectedType, setSelectedType] = useState<string>('');
-    const AreaTypes = getAreaTypes(t);
 
     // Reset selected type when dialog opens
     useEffect(() => {
@@ -69,7 +68,7 @@ export default function AreaTypeDialog({
                         <label className="text-sm font-medium">{t("areas.polygonType")}</label>
                         <div className="border rounded-lg p-2 max-h-[300px] overflow-y-auto">
                             <div className="grid gap-1">
-                                {AreaTypes.map((type) => (
+                                {areaTypes.map((type) => (
                                     <Button
                                         key={type.value}
                                         variant={selectedType === type.value ? "default" : "ghost"}
@@ -88,7 +87,7 @@ export default function AreaTypeDialog({
                                                 style={{ backgroundColor: type.color }}
                                             ></div>
                                             <span className="text-sm font-medium transition-colors duration-200">
-                                                {type.label}
+                                                {t(`${type.label_key}`)|| ""} 
                                             </span>
                                         </div>
                                     </Button>

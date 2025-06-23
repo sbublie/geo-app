@@ -1,14 +1,14 @@
 "use client";
 
 // Components
-import MapContainer from "@/components/map/mapContainer";
-import GameControls from "@/components/game/gameControls";
-import DrawingControls from "@/components/drawing/drawingControls";
-import InfoPanels from "@/components/info/infoPanels";
-import FilterMenu from "@/components/map/filterMenu";
-import LineDetailsDialog from "@/components/map/LineDetailsDialog";
-import AreaTypeDialog from "@/components/dialogs/areaTypeDialog";
-import { getWindDirectionText } from "@/lib/weatherApi";
+import MapContainer from "@/components/map/MapContainer";
+import GameControls from "@/components/game/GameControls";
+import DrawingControls from "@/components/drawing/DrawingControls";
+import InfoPanels from "@/components/info/InfoPanels";
+import FilterMenu from "@/components/map/FilterMenu";
+import LineDetailsDialog from "@/components/dialogs/LineDetailsDialog";
+import AreaTypeDialog from "@/components/dialogs/AreaTypeDialog";
+import { getWindDirectionText } from "@/lib/api/weatherApi";
 
 // Hooks
 import { useMapLogic } from "@/hooks/useMapLogic";

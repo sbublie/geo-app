@@ -1,4 +1,4 @@
-// Circle functions remain the same
+
 function createCircle(center: [number, number], radiusInMeters: number, points = 64) {
   const [lng, lat] = center;
   const coords = [];

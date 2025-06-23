@@ -1,7 +1,8 @@
 import React from "react";
 import { SelectSeparator } from "../ui/select";
 import { useTranslations } from "next-intl";
-import { LineType, LINE_CONFIGS } from "@/types/LineConfig";
+import { LineType } from "@/types/LineConfig";
+import { lineConfig } from '@/lib/config/lineConfig';
 
 interface LineDetailsDialogProps {
   line: { properties: Record<string, any> };
@@ -15,7 +16,7 @@ export default function LineDetailsDialog({ line, type, onClose }: LineDetailsDi
   if (!line) return null;
   
   const properties = line.properties || {};
-  const config = LINE_CONFIGS[type];
+  const config = lineConfig[type];
   const highlightFields = config.highlightFields || [];
 
   return (

@@ -3,7 +3,7 @@
 import { LoadingSpinner } from "@/components/ui/spinner";
 import WindArrow from '@/components/ui/wind';
 import { useTranslations } from 'next-intl';
-import WeatherData from '@/types/weatherData';
+import WeatherData from '@/types/WeatherData';
 
 interface InfoPanelsProps {
   weatherData: WeatherData | null;

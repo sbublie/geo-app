@@ -10,7 +10,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Filter } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { LINE_CONFIGS, LineType } from '@/types/LineConfig';
+import { LineType } from '@/types/LineConfig';
+import { lineConfig } from '@/lib/config/lineConfig';
 
 
 interface FilterMenuProps {
@@ -44,7 +45,7 @@ export default function FilterMenu({
         <DropdownMenuSeparator />
         <div className="p-2 space-y-3">
           {enabledLineTypes.map((lineType) => {
-            const config = LINE_CONFIGS[lineType];
+            const config = lineConfig[lineType];
             const IconComponent = config.icon || Filter;
             const colorClass = config.colorClass || 'text-gray-600';
             return (

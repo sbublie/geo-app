@@ -3,19 +3,20 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { updateCircle } from "@/lib/shapes/circle";
-import { getLocationInfo } from "@/lib/places";
-import fetchWeatherData from "@/lib/weatherApi";
+import { getLocationInfo } from "@/lib/api/placesApi";
+import fetchWeatherData from "@/lib/api/weatherApi";
 import { 
   getInfrastructureLinesInArea, 
-  createBoundingBoxFromCenter,
-  GenericLine
-} from "@/lib/osmApi";
+  createBoundingBoxFromCenter
+} from "@/lib/api/osmApi";
+import GenericLine from '@/types/GenericLine';
 import { drawLines, removeLines, GenericLineFeature } from "@/lib/shapes/lines";
-import WeatherData from '@/types/weatherData';
+import WeatherData from '@/types/WeatherData';
 import { usePolygonDrawing } from '@/hooks/usePolygonDrawing';
-import { LINE_CONFIGS, LineType } from '@/types/LineConfig';
+import { LineType } from '@/types/LineConfig';
+import { lineConfig } from '@/lib/config/lineConfig';
 
-const ENABLED_LINE_TYPES: LineType[] = Object.keys(LINE_CONFIGS) as LineType[];
+const ENABLED_LINE_TYPES: LineType[] = Object.keys(lineConfig) as LineType[];
 
 export function useMapLogic() {
   const map = useRef<mapboxgl.Map | null>(null);
@@ -140,7 +141,7 @@ export function useMapLogic() {
   const getSelectedLineType = useCallback((line: GenericLineFeature | null): LineType => {
     if (!line?.properties) return "highway";
     for (const lineType of ENABLED_LINE_TYPES) {
-      const config = LINE_CONFIGS[lineType];
+      const config = lineConfig[lineType];
       if (line.properties[config.tagKey]) {
         return lineType;
       }
@@ -186,5 +187,5 @@ export function getEnabledLineTypes(): LineType[] {
 }
 
 export function getLineTypeConfig(lineType: LineType) {
-  return LINE_CONFIGS[lineType];
+  return lineConfig[lineType];
 }

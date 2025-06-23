@@ -1,7 +1,7 @@
 
 import React from 'react';
 import * as turf from '@turf/turf';
-import { getAreaTypes } from '@/types/areas';
+import { areaTypes } from '@/lib/config/areaTypes';
 import { useTranslations } from 'next-intl';
 
 // Function to update polygon preview
@@ -114,7 +114,6 @@ export function updatePolygonPreview(points: [number, number][], map: React.Muta
 // Function to add completed polygon
 export function addCompletedPolygon(points: [number, number][], index: number, areaType: string, map: React.MutableRefObject<mapboxgl.Map | null>, t: ReturnType<typeof useTranslations>) {
     if (!map.current || points.length < 3) return;
-    const AreaTypes = getAreaTypes(t);
 
     // Close the polygon by adding the first point at the end
     const closedPoints = [...points, points[0]];
@@ -134,7 +133,7 @@ export function addCompletedPolygon(points: [number, number][], index: number, a
     const centroid = turf.centroid(polygonData);
 
     // Get area type info
-    const typeInfo = AreaTypes.find(type => type.value === areaType) || AreaTypes.find(type => type.value === 'other')!;
+    const typeInfo = areaTypes.find(type => type.value === areaType) || areaTypes.find(type => type.value === 'other')!;
 
     const sourceId = `completed-polygon-${index}`;
 
@@ -179,7 +178,7 @@ export function addCompletedPolygon(points: [number, number][], index: number, a
         },
         properties: {
             area: areaText,
-            type: typeInfo.label
+            type: t(`${typeInfo.label_key}`)
         }
     };
 
