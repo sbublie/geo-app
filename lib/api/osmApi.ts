@@ -1,8 +1,8 @@
-import { LineType } from '@/types/LineConfig'; 
+import { LineType } from '@/types/LineConfig';
 import { lineConfig } from '@/lib/config/lineConfig';
-import GenericLine from '@/types/GenericLine'; // Assuming you have a GenericLine type defined
-import OverpassResponse from '@/types/OverpassResponse'; // Assuming you have an OverpassResponse type defined
-import BoundingBox from '@/types/BoundingBox'; // Assuming you have a BoundingBox type defined
+import GenericLine from '@/types/GenericLine';
+import OverpassResponse from '@/types/OverpassResponse';
+import BoundingBox from '@/types/BoundingBox';
 
 /**
  * Generic function to fetch infrastructure lines in a specified bounding box area using the OSM Overpass API
@@ -98,17 +98,90 @@ function processOverpassData(
 }
 
 /**
- * Helper function to create a bounding box from center point and radius
+ * Generic function to fetch all enabled infrastructure lines in a specified bounding box area using the OSM Overpass API
  */
-export function createBoundingBoxFromCenter(lat: number, lon: number, radiusKm: number): BoundingBox {
-  const latDelta = radiusKm / 111; // Rough conversion: 1 degree ≈ 111 km
-  const lonDelta = radiusKm / (111 * Math.cos(lat * Math.PI / 180));
-  
-  return {
-    south: lat - latDelta,
-    west: lon - lonDelta,
-    north: lat + latDelta,
-    east: lon + lonDelta
+export async function getAllInfrastructureLines(
+  boundingBox: BoundingBox,
+  enabledTypes: LineType[],
+  overpassUrl: string = 'https://overpass-api.de/api/interpreter'
+): Promise<Record<LineType, GenericLine[]>> {
+  const { south, west, north, east } = boundingBox;
+
+  // Build the combined Overpass QL query
+  let query = `[out:json][timeout:25];(`;
+  for (const type of enabledTypes) {
+    const config = lineConfig[type];
+    if (!config) continue;
+    const values = config.type_values?.join('|') || '';
+    query += `
+      way["${config.tagKey}"~"${values}"](${south},${west},${north},${east});
+      relation["${config.tagKey}"~"${values}"](${south},${west},${north},${east});
+    `;
+  }
+  query += `);out geom;`;
+
+  // Fetch and process
+  try {
+    const response = await fetch(overpassUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `data=${encodeURIComponent(query)}`,
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data: OverpassResponse = await response.json();
+    return splitLinesByType(data, enabledTypes);
+  } catch (error) {
+    console.error('Error fetching lines:', error);
+    throw new Error(`Failed to fetch lines: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}
+
+// Helper: Split lines by type after fetching
+function splitLinesByType(
+  data: OverpassResponse,
+  enabledTypes: LineType[]
+): Record<LineType, GenericLine[]> {
+  const result: Record<LineType, GenericLine[]> = {
+    railway: [],
+    power: [],
+    highway: [],
+    waterway: [],
+    pipeline: [],
   };
+
+  // Only keep enabled types
+  enabledTypes.forEach(type => {
+    result[type] = [];
+  });
+
+  data.elements.forEach(element => {
+    if (element.type === 'way' && element.tags && element.geometry) {
+      for (const type of enabledTypes) {
+        const config = lineConfig[type];
+        if (
+          config &&
+          element.tags[config.tagKey] &&
+          (!config.type_values || config.type_values.includes(element.tags[config.tagKey]))
+        ) {
+          const coordinates = element.geometry.map(coor => [coor.lon, coor.lat]);
+          if (coordinates.length > 1) {
+            result[type].push({
+              type: 'Feature',
+              id: element.id,
+              properties: { id: element.id, ...element.tags },
+              geometry: { type: 'LineString', coordinates }
+            });
+          }
+          break; // Only assign to the first matching type
+        }
+      }
+    }
+  });
+
+  return result;
 }
 

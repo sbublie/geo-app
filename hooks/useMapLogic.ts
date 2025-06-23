@@ -6,9 +6,9 @@ import { updateCircle } from "@/lib/shapes/circle";
 import { getLocationInfo } from "@/lib/api/placesApi";
 import fetchWeatherData from "@/lib/api/weatherApi";
 import { 
-  getInfrastructureLinesInArea, 
-  createBoundingBoxFromCenter
+  getAllInfrastructureLines
 } from "@/lib/api/osmApi";
+import createBoundingBoxFromCenter from '@/lib/shapes/boundingBox';
 import GenericLine from '@/types/GenericLine';
 import { drawLines, removeLines, GenericLineFeature } from "@/lib/shapes/lines";
 import WeatherData from '@/types/WeatherData';
@@ -96,24 +96,13 @@ export function useMapLogic() {
     setGameState('loading');
     try {
       const boundingBox = createBoundingBoxFromCenter(coordinates.lat, coordinates.lng, radius / 1000);
-      // Fetch all enabled line types in parallel
-      const linePromises = ENABLED_LINE_TYPES.map(async (lineType) => {
-        const lines = await getInfrastructureLinesInArea(boundingBox, lineType);
-        return { lineType, lines };
-      });
-
-      const lineResults = await Promise.all(linePromises);
-      // Update line data state
-      const newLineData = { ...lineData };
-      lineResults.forEach(({ lineType, lines }) => {
-        newLineData[lineType] = lines;
-      });
-      setLineData(newLineData);
+      const allLines = await getAllInfrastructureLines(boundingBox, ENABLED_LINE_TYPES);
+      setLineData(allLines);
 
       // Draw visible line types
       ENABLED_LINE_TYPES.forEach((lineType) => {
-        if (lineVisibility[lineType] && newLineData[lineType].length > 0) {
-          drawLines(newLineData[lineType], lineType, map, setSelectedLine);
+        if (lineVisibility[lineType] && allLines[lineType].length > 0) {
+          drawLines(allLines[lineType], lineType, map, setSelectedLine);
         }
       });
 

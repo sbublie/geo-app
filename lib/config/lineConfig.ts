@@ -16,11 +16,11 @@ export const lineConfig: Record<LineType, LineConfig> = {
     layerId: "railway-lines-layer",
     sourceId: "railway-lines",
     colors: {
-      rail: "#2563eb",
+      rail: "#16a34a",
       light_rail: "#16a34a",
-      subway: "#dc2626",
-      tram: "#ea580c",
-      default: "#6b7280"
+      subway: "#16a34a",
+      tram: "#16a34a",
+      default: "#16a34a"
     },
     widths: {
       rail: 3,
@@ -65,24 +65,24 @@ export const lineConfig: Record<LineType, LineConfig> = {
   },
   highway: {
     type: "highway",
-    type_values: ["motorway", "trunk", "primary", "secondary", "tertiary"],
+    type_values: ["motorway", "trunk", "primary", "secondary", "tertiary", "track", "cycleway", "service" ],
     layerId: "highway-lines-layer",
     sourceId: "highway-lines",
     colors: {
-      motorway: "#6366f1",
+      motorway: "#f59e42",
       trunk: "#f59e42",
       primary: "#fbbf24",
       secondary: "#f59e42",
       tertiary: "#fbbf24",
-      default: "#6b7280"
+      default: "#fbbf24"
     },
     widths: {
-      motorway: 4,
-      trunk: 3,
-      primary: 2,
-      secondary: 2,
-      tertiary: 1,
-      default: 1
+      motorway: 5,
+      trunk: 5,
+      primary: 5,
+      secondary: 3,
+      tertiary: 3,
+      default: 3
     },
     tagKey: "highway",
     highlightFields: [
@@ -121,12 +121,12 @@ export const lineConfig: Record<LineType, LineConfig> = {
   },
   pipeline: {
     type: "pipeline",
-    type_values: [],
+    //type_values: [],
     layerId: "pipeline-lines-layer",
     sourceId: "pipeline-lines",
     colors: {
-      pipeline: "#ea580c",
-      default: "#ea580c"
+      pipeline: "#747474",
+      default: "#747474"
     },
     widths: {
       pipeline: 2,
