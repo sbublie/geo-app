@@ -114,6 +114,36 @@ export function updatePolygonPreview(points: [number, number][], map: React.Muta
 export function addCompletedPolygon(points: [number, number][], index: number, areaType: string, map: React.MutableRefObject<mapboxgl.Map | null>, t: ReturnType<typeof useTranslations>) {
     if (!map.current || points.length < 3) return;
 
+    // Remove existing layers and sources for this polygon index
+    const sourceId = `completed-polygon-${index}`;
+    const fillLayerId = `completed-polygon-fill-${index}`;
+    const outlineLayerId = `completed-polygon-outline-${index}`;
+    const labelSourceId = `polygon-label-${index}`;
+    const labelTextLayerId = `polygon-label-text-${index}`;
+    const labelBgLayerId = `polygon-label-bg-${index}`;
+
+    // Remove polygon layers and source
+    if (map.current.getLayer(fillLayerId)) {
+        map.current.removeLayer(fillLayerId);
+    }
+    if (map.current.getLayer(outlineLayerId)) {
+        map.current.removeLayer(outlineLayerId);
+    }
+    if (map.current.getSource(sourceId)) {
+        map.current.removeSource(sourceId);
+    }
+
+    // Remove label layers and source
+    if (map.current.getLayer(labelTextLayerId)) {
+        map.current.removeLayer(labelTextLayerId);
+    }
+    if (map.current.getLayer(labelBgLayerId)) {
+        map.current.removeLayer(labelBgLayerId);
+    }
+    if (map.current.getSource(labelSourceId)) {
+        map.current.removeSource(labelSourceId);
+    }
+
     // Close the polygon by adding the first point at the end
     const closedPoints = [...points, points[0]];
 
@@ -134,8 +164,6 @@ export function addCompletedPolygon(points: [number, number][], index: number, a
     // Get area type info
     const typeInfo = drawAreaTypes.find(type => type.value === areaType) || drawAreaTypes.find(type => type.value === 'other')!;
 
-    const sourceId = `completed-polygon-${index}`;
-
     map.current.addSource(sourceId, {
         type: 'geojson',
         data: polygonData
@@ -143,7 +171,7 @@ export function addCompletedPolygon(points: [number, number][], index: number, a
 
     // Add fill layer with type-specific color
     map.current.addLayer({
-        id: `completed-polygon-fill-${index}`,
+        id: fillLayerId,
         type: 'fill',
         source: sourceId,
         paint: {
@@ -154,7 +182,7 @@ export function addCompletedPolygon(points: [number, number][], index: number, a
 
     // Add outline layer with type-specific color
     map.current.addLayer({
-        id: `completed-polygon-outline-${index}`,
+        id: outlineLayerId,
         type: 'line',
         source: sourceId,
         paint: {
@@ -164,11 +192,6 @@ export function addCompletedPolygon(points: [number, number][], index: number, a
     });
 
     // Add area label at polygon centroid
-    const labelSourceId = `polygon-label-${index}`;
-    const areaText = areaInKm2 < 0.01
-        ? `${Math.round(area)} m²`
-        : `${areaInKm2.toFixed(2)} km²`;
-
     const labelData = {
         type: 'Feature' as const,
         geometry: {
@@ -176,7 +199,9 @@ export function addCompletedPolygon(points: [number, number][], index: number, a
             coordinates: centroid.geometry.coordinates
         },
         properties: {
-            area: areaText,
+            area: areaInKm2 < 0.01
+                ? `${Math.round(area)} m²`
+                : `${areaInKm2.toFixed(2)} km²`,
             type: t(`${typeInfo.labelKey}`)
         }
     };
@@ -188,7 +213,7 @@ export function addCompletedPolygon(points: [number, number][], index: number, a
 
     // Add text layer for area label (area + type)
     map.current.addLayer({
-        id: `polygon-label-text-${index}`,
+        id: labelTextLayerId,
         type: 'symbol',
         source: labelSourceId,
         layout: {
@@ -212,7 +237,7 @@ export function addCompletedPolygon(points: [number, number][], index: number, a
 
     // Add background circle for better readability with type-specific color
     map.current.addLayer({
-        id: `polygon-label-bg-${index}`,
+        id: labelBgLayerId,
         type: 'circle',
         source: labelSourceId,
         paint: {
@@ -222,7 +247,7 @@ export function addCompletedPolygon(points: [number, number][], index: number, a
             'circle-stroke-color': typeInfo.color,
             'circle-stroke-width': 3
         }
-    }, `polygon-label-text-${index}`); // Insert below text layer
+    }, labelTextLayerId); // Insert below text layer
 
 };
 

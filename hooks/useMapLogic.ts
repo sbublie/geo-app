@@ -80,13 +80,68 @@ export function useMapLogic(isDrawingMode: boolean = false) { // Accept as param
     ENABLED_AREA_TYPES.reduce((acc, type) => ({ ...acc, [type]: [] }), {} as Record<AreaType, GenericArea[]>)
   );
 
+  // Add map style state
+  const [mapStyle, setMapStyle] = useState<string>('mapbox://styles/mapbox/streets-v12');
+
+  // Add a handler to change the style
+  const handleMapStyleChange = useCallback((newStyle: string) => {
+    setMapStyle(newStyle);
+    if (map.current) {
+      // Save current view state
+      const center = map.current.getCenter();
+      const zoom = map.current.getZoom();
+      const bearing = map.current.getBearing();
+      const pitch = map.current.getPitch();
+
+      map.current.setStyle(newStyle);
+
+      map.current.once('styledata', () => {
+        // Restore view state
+        map.current?.setCenter(center);
+        map.current?.setZoom(zoom);
+        map.current?.setBearing(bearing);
+        map.current?.setPitch(pitch);
+
+        // Redraw all custom layers and markers here:
+        // Redraw polygons/areas
+        ENABLED_AREA_TYPES.forEach((areaType) => {
+          if (areaVisibility[areaType] && areaData[areaType].length > 0) {
+            drawAreas(areaData[areaType], areaType, map, setSelectedObject, isDrawingMode);
+          }
+        });
+        // Redraw lines
+        ENABLED_LINE_TYPES.forEach((lineType) => {
+          if (lineVisibility[lineType] && lineData[lineType].length > 0) {
+            drawLines(lineData[lineType], lineType, map, setSelectedObject, isDrawingMode);
+          }
+        });
+        // Remove all old markers before adding new ones!
+        removeAllMarkers();
+        // Redraw markers
+        ENABLED_NODE_TYPES.forEach((nodeType) => {
+          if (nodeVisibility[nodeType] && nodeData[nodeType].length > 0) {
+            addMarkers(map, nodeData[nodeType], nodeType, setSelectedObject, isDrawingMode);
+          }
+        });
+      });
+    }
+  }, [
+    map, setMapStyle, areaVisibility, areaData, lineVisibility, lineData, nodeVisibility, nodeData,
+    ENABLED_AREA_TYPES, ENABLED_LINE_TYPES, ENABLED_NODE_TYPES,
+    setSelectedObject, isDrawingMode
+]);
+
+  // Update handleMapLoad to use the selected style
   const handleMapLoad = useCallback((mapRef: React.MutableRefObject<mapboxgl.Map | null>) => {
     map.current = mapRef.current;
+    if (map.current) {
+      map.current.setStyle(mapStyle);
+    }
     getLocationInfo(defaultLocation[0], defaultLocation[1]).then(setLocationInfo);
     updateCircle(defaultLocation, radius, map, lastCircleParams);
     fetchWeatherData(defaultLocation[0], defaultLocation[1], setWeatherData, setWeatherLoading);
     setMapLoaded(true);
-  }, [radius]);
+  }, [radius, mapStyle]);
 
   const handleMarkerDragEnd = useCallback((lngLat: mapboxgl.LngLat) => {
     const roundedCoords = {
@@ -240,7 +295,10 @@ export function useMapLogic(isDrawingMode: boolean = false) { // Accept as param
     // Refs
     map,
     marker,
-    lastCircleParams
+    lastCircleParams,
+    // Map style
+    mapStyle,
+    handleMapStyleChange,
   };
 }
 

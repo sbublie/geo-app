@@ -13,6 +13,7 @@ interface MapContainerProps {
   coordinates: { lng: number; lat: number };
   radius: number;
   markerRef: React.MutableRefObject<mapboxgl.Marker | null>;
+  mapStyle: string; // <-- add this
 }
 
 export default function MapContainer({ 
@@ -20,7 +21,8 @@ export default function MapContainer({
   onMarkerDragEnd, 
   appState, 
   coordinates,
-  markerRef
+  markerRef,
+  mapStyle // <-- add this
 }: MapContainerProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -33,7 +35,7 @@ export default function MapContainer({
     if (mapContainer.current) {
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
-        style: mapbox_style as any,
+        style: mapStyle, // <-- use the prop
         center: defaultLocation,
         zoom: 16
       });
@@ -54,7 +56,7 @@ export default function MapContainer({
         onMapLoad(map);
       });
     }
-  }, [onMapLoad, onMarkerDragEnd, markerRef]);
+  }, [onMapLoad, onMarkerDragEnd, markerRef, mapStyle]); // <-- add mapStyle to deps
 
   // Update marker based on game state and coordinates
   useEffect(() => {

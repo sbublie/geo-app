@@ -9,13 +9,16 @@ import FilterMenu from "@/components/map/FilterMenu";
 import LineDetailsDialog from "@/components/dialogs/DetailsDialog";
 import DrawAreaTypeDialog from "@/components/dialogs/DrawAreaTypeDialog";
 import { getWindDirectionText } from "@/lib/api/weatherApi";
+import MapStyleSwitcher from "@/components/map/MapStyleSwitcher";
 
 // Hooks
 import { useMapLogic } from "@/hooks/useMapLogic";
 import { usePolygonDrawing } from "@/hooks/usePolygonDrawing";
 import { useEffect, useRef, useCallback } from "react";
+import { addCompletedPolygon } from "@/lib/shapes/drawArea";
 
 import "mapbox-gl/dist/mapbox-gl.css";
+import { useTranslations } from "next-intl";
 
 export default function Home() {
   // First get polygon drawing hook
@@ -58,7 +61,11 @@ export default function Home() {
     handleToggleAreaType,
     map,
     marker,
+    mapStyle,
+    handleMapStyleChange,
   } = useMapLogic(isDrawingMode); // Pass drawing mode here
+
+  const t = useTranslations();
 
   // Sync map refs
   useEffect(() => {
@@ -81,6 +88,15 @@ export default function Home() {
     setIsDrawingMode(false); // Exit drawing mode
   }, [resetGame, clearAllPolygons, setIsDrawingMode]);
 
+  // Redraw drawn polygons after map style changes
+  useEffect(() => {
+    if (!mapRef.current) return;
+/*     drawnPolygons.forEach((polygon, index) => {
+
+      addCompletedPolygon(polygon, index, 'rescue', mapRef, t);
+    }); */
+  }, [mapStyle]); // Redraw when mapStyle changes
+
   return (
     <div className="w-full h-screen relative">
       <MapContainer
@@ -90,6 +106,7 @@ export default function Home() {
         coordinates={coordinates}
         radius={radius}
         markerRef={marker}
+        mapStyle={mapStyle} // <-- pass the style
       />
 
       {/* Filter Menu */}
@@ -111,6 +128,9 @@ export default function Home() {
 
       {/* Top-right controls container */}
       <div className="absolute top-4 right-4 flex flex-col gap-4 z-10">
+        {/* Map Style Switcher */}
+        <MapStyleSwitcher currentStyle={mapStyle} onChange={handleMapStyleChange} />
+
         {/* Game Controls */}
         <GameControls
           appState={appState}

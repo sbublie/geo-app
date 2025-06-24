@@ -189,5 +189,6 @@ export function usePolygonDrawing(mapRef: React.MutableRefObject<mapboxgl.Map | 
     handleAreaTypeSelect,
     clearAllPolygons, // Make sure this is included in the return
     setIsDrawingMode,
+    polygonTypes
   };
 }
