@@ -135,6 +135,7 @@ export default function DetailsDialog({ selectedObject, onClose }: DetailsDialog
       
       return translated;
     } catch (error) {
+      console.warn(`Translation failed for label key: ${labelKey}`, error);
       // If translation fails, return formatted raw label
       return labelKey.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
     }
@@ -155,6 +156,7 @@ export default function DetailsDialog({ selectedObject, onClose }: DetailsDialog
       
       return translated;
     } catch (error) {
+      console.warn(`Translation failed for title key: ${titleKey}`, error);
       return type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) + ' Details';
     }
   };
