@@ -2,10 +2,10 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import mapboxgl from 'mapbox-gl';
-import { addCompletedPolygon, updatePolygonPreview, clearAllPolygons, clearPolygonPreview } from "@/lib/shapes/drawArea";
+import { addCompletedPolygon, updatePolygonPreview, clearAllPolygons as clearAllPolygonsLib, clearPolygonPreview } from "@/lib/shapes/drawArea";
 import { useTranslations } from 'next-intl';
 
-export function usePolygonDrawing(map: React.MutableRefObject<mapboxgl.Map | null>) {
+export function usePolygonDrawing(mapRef: React.MutableRefObject<mapboxgl.Map | null>) {
   const t = useTranslations();
   
   const [isDrawingMode, setIsDrawingMode] = useState(false);
@@ -22,21 +22,21 @@ export function usePolygonDrawing(map: React.MutableRefObject<mapboxgl.Map | nul
       if (!newMode) {
         // Exiting drawing mode - clear current polygon
         setCurrentPolygon([]);
-        clearPolygonPreview(map);
+        clearPolygonPreview(mapRef);
 
         // Reset cursor to default
-        if (map.current) {
-          map.current.getCanvas().style.cursor = '';
+        if (mapRef.current) {
+          mapRef.current.getCanvas().style.cursor = '';
         }
       } else {
         // Entering drawing mode - set crosshair cursor
-        if (map.current) {
-          map.current.getCanvas().style.cursor = 'crosshair';
+        if (mapRef.current) {
+          mapRef.current.getCanvas().style.cursor = 'crosshair';
         }
       }
       return newMode;
     });
-  }, [map]);
+  }, [mapRef]);
 
   // Handle area type selection
   const handleAreaTypeSelect = useCallback((areaType: string) => {
@@ -52,37 +52,54 @@ export function usePolygonDrawing(map: React.MutableRefObject<mapboxgl.Map | nul
 
     // Add polygon to state and map
     setDrawnPolygons(prev => [...prev, pendingPolygon.points]);
-    addCompletedPolygon(pendingPolygon.points, pendingPolygon.index, areaType, map, t);
+    addCompletedPolygon(pendingPolygon.points, pendingPolygon.index, areaType, mapRef, t);
 
     // Close dialog and reset pending polygon
     setShowAreaTypeDialog(false);
     setPendingPolygon(null);
-  }, [pendingPolygon, map, t]);
+  }, [pendingPolygon, mapRef, t]);
 
   // Clear all polygons
-  const clearAllPolygonsHandler = useCallback(() => {
-    clearAllPolygons(map, drawnPolygons, setDrawnPolygons, setCurrentPolygon, setPolygonTypes);
-  }, [map, drawnPolygons]);
+  const clearAllPolygons = useCallback(() => {
+    // Clear drawn polygons from state
+    setDrawnPolygons([]);
+    
+    // Clear polygons from map
+    if (mapRef.current) {
+      // Remove all polygon sources and layers
+      drawnPolygons.forEach((polygon, index) => {
+        const sourceId = `polygon-${index}`;
+        const layerId = `polygon-layer-${index}`;
+        
+        if (mapRef.current!.getLayer(layerId)) {
+          mapRef.current!.removeLayer(layerId);
+        }
+        if (mapRef.current!.getSource(sourceId)) {
+          mapRef.current!.removeSource(sourceId);
+        }
+      });
+    }
+  }, [drawnPolygons, mapRef]);
 
   // Handle drawing mode cursor and zoom behavior
   useEffect(() => {
-    if (!map.current) return;
+    if (!mapRef.current) return;
 
     if (isDrawingMode) {
       // Disable double-click zoom when in drawing mode
-      map.current.doubleClickZoom.disable();
+      mapRef.current.doubleClickZoom.disable();
       // Change cursor to crosshair for drawing mode
-      map.current.getCanvas().style.cursor = 'crosshair';
+      mapRef.current.getCanvas().style.cursor = 'crosshair';
     } else {
-      map.current?.doubleClickZoom.enable();
+      mapRef.current?.doubleClickZoom.enable();
       // Reset cursor to default
-      map.current.getCanvas().style.cursor = '';
+      mapRef.current.getCanvas().style.cursor = '';
     }
   }, [isDrawingMode]);
 
   // Handle map click events for polygon drawing
   useEffect(() => {
-    if (!map.current) return;
+    if (!mapRef.current) return;
 
     const handleMapClick = (e: mapboxgl.MapMouseEvent) => {
       if (!isDrawingMode) return;
@@ -92,7 +109,7 @@ export function usePolygonDrawing(map: React.MutableRefObject<mapboxgl.Map | nul
 
       setCurrentPolygon(prev => {
         const updated = [...prev, newPoint];
-        updatePolygonPreview(updated, map);
+        updatePolygonPreview(updated, mapRef);
         return updated;
       });
     };
@@ -103,7 +120,7 @@ export function usePolygonDrawing(map: React.MutableRefObject<mapboxgl.Map | nul
       // Complete the polygon and show type selection
       const completedPolygon = [...currentPolygon];
       setCurrentPolygon([]);
-      clearPolygonPreview(map);
+      clearPolygonPreview(mapRef);
 
       // Show dialog for area type selection
       setPendingPolygon({
@@ -116,48 +133,46 @@ export function usePolygonDrawing(map: React.MutableRefObject<mapboxgl.Map | nul
     const handleMouseMove = () => {
       if (!isDrawingMode) return;
       // Change cursor to crosshair when moving over the map in drawing mode
-      map.current!.getCanvas().style.cursor = 'crosshair';
+      mapRef.current!.getCanvas().style.cursor = 'crosshair';
     };
 
     const handleMouseLeave = () => {
       if (!isDrawingMode) return;
       // Keep crosshair cursor even when leaving the map in drawing mode
-      map.current!.getCanvas().style.cursor = 'crosshair';
+      mapRef.current!.getCanvas().style.cursor = 'crosshair';
     };
 
     // Remove existing listeners
-    map.current.off('click', handleMapClick);
-    map.current.off('dblclick', handleMapDoubleClick);
-    map.current.off('mousemove', handleMouseMove);
-    map.current.off('mouseleave', handleMouseLeave);
+    mapRef.current.off('click', handleMapClick);
+    mapRef.current.off('dblclick', handleMapDoubleClick);
+    mapRef.current.off('mousemove', handleMouseMove);
+    mapRef.current.off('mouseleave', handleMouseLeave);
 
     // Add new listeners
-    map.current.on('click', handleMapClick);
-    map.current.on('dblclick', handleMapDoubleClick);
-    map.current.on('mousemove', handleMouseMove);
-    map.current.on('mouseleave', handleMouseLeave);
+    mapRef.current.on('click', handleMapClick);
+    mapRef.current.on('dblclick', handleMapDoubleClick);
+    mapRef.current.on('mousemove', handleMouseMove);
+    mapRef.current.on('mouseleave', handleMouseLeave);
 
     return () => {
-      if (map.current) {
-        map.current.off('click', handleMapClick);
-        map.current.off('dblclick', handleMapDoubleClick);
-        map.current.off('mousemove', handleMouseMove);
-        map.current.off('mouseleave', handleMouseLeave);
+      if (mapRef.current) {
+        mapRef.current.off('click', handleMapClick);
+        mapRef.current.off('dblclick', handleMapDoubleClick);
+        mapRef.current.off('mousemove', handleMouseMove);
+        mapRef.current.off('mouseleave', handleMouseLeave);
       }
     };
-  }, [isDrawingMode, currentPolygon, drawnPolygons.length, map]);
+  }, [isDrawingMode, currentPolygon, drawnPolygons.length, mapRef]);
 
   return {
     isDrawingMode,
-    setIsDrawingMode,
     currentPolygon,
     drawnPolygons,
     showAreaTypeDialog,
     pendingPolygon,
-    polygonTypes,
     toggleDrawingMode,
     handleAreaTypeSelect,
-    clearAllPolygons: clearAllPolygonsHandler,
-    setShowAreaTypeDialog
+    clearAllPolygons, // Make sure this is included in the return
+    setIsDrawingMode,
   };
 }

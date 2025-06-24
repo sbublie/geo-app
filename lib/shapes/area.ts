@@ -31,7 +31,8 @@ export function drawAreas(
   features: GenericAreaFeature[],
   areaType: AreaTypeKey,
   map: React.MutableRefObject<mapboxgl.Map | null>,
-  setSelectedObject: React.Dispatch<React.SetStateAction<SelectedAreaWithPoint | SelectedLineWithPoint | null>>
+  setSelectedObject: React.Dispatch<React.SetStateAction<SelectedAreaWithPoint | SelectedLineWithPoint | null>>,
+  isDrawingMode: boolean
 ) {
   if (!map.current) return;
 
@@ -96,6 +97,7 @@ export function drawAreas(
 
   // Define handlers so we can remove them later
   const handleClick = (e: mapboxgl.MapLayerMouseEvent) => {
+    if (isDrawingMode) return; // <-- block if drawing
     if (e.features && e.features[0]) {
       const feature = e.features[0] as GenericAreaFeature;
       const point = map.current!.project(e.lngLat);

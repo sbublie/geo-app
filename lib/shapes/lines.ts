@@ -25,7 +25,8 @@ export function drawLines(
   map: React.MutableRefObject<mapboxgl.Map | null>,
   setSelectedObject: React.Dispatch<
     React.SetStateAction<SelectedLineWithPoint | SelectedNodeWithPoint | null>
-  >
+  >,
+  isDrawingMode: boolean 
 ) {
   if (!map.current) return;
 
@@ -95,6 +96,7 @@ export function drawLines(
 
   // Add click event listener
   map.current.on("click", layerId, (e) => {
+    if (isDrawingMode) return; // <-- block if drawing
     if (e.features && e.features[0]) {
       const feature = e.features[0] as GenericLineFeature;
       const point = map.current!.project(e.lngLat);

@@ -19,7 +19,8 @@ export function addMarkers(
   map: React.MutableRefObject<mapboxgl.Map | null>,
   nodes: GenericNode[],
   nodeType: NodeType,
-  setSelectedObject: React.Dispatch<React.SetStateAction<SelectedNodeWithPoint | SelectedLineWithPoint | null>>
+  setSelectedObject: React.Dispatch<React.SetStateAction<SelectedNodeWithPoint | SelectedLineWithPoint | null>>,
+  isDrawingMode: boolean
 ) {
   if (!map.current || !nodes || nodes.length === 0) return;
 
@@ -56,6 +57,7 @@ export function addMarkers(
 
     // Add click event listener to the marker element (not the map layer)
     markerElement.addEventListener("click", (e) => {
+      if (isDrawingMode) return; // <-- block if drawing
       e.stopPropagation(); // Prevent event bubbling
       // Get pixel position for dialog placement
       const point = map.current!.project(node.geometry.coordinates as [number, number]);

@@ -32,12 +32,11 @@ const ENABLED_LINE_TYPES: LineType[] = Object.keys(lineConfig) as LineType[];
 const ENABLED_NODE_TYPES: NodeType[] = Object.keys(nodeConfig) as NodeType[];
 const ENABLED_AREA_TYPES: AreaType[] = Object.keys(areaConfig) as AreaType[];
 
-export function useMapLogic() {
+export function useMapLogic(isDrawingMode: boolean = false) { // Accept as parameter
   const map = useRef<mapboxgl.Map | null>(null);
   const marker = useRef<mapboxgl.Marker | null>(null);
   const lastCircleParams = useRef<{ center: [number, number]; radius: number } | null>(null);
   const defaultLocation: [number, number] = [8.79053, 47.99143];
-  const { clearAllPolygons } = usePolygonDrawing(map);
 
   const [coordinates, setCoordinates] = useState<{ lng: number; lat: number }>({ 
     lng: defaultLocation[0], 
@@ -50,7 +49,7 @@ export function useMapLogic() {
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [weatherLoading, setWeatherLoading] = useState(false);
   const [selectedObject, setSelectedObject] = useState<SelectedLineWithPoint | SelectedNodeWithPoint | SelectedAreaWithPoint | null>(null);
-  
+
   // Generic line visibility state
   const [lineVisibility, setLineVisibility] = useState<Record<LineType, boolean>>(
     ENABLED_LINE_TYPES.reduce((acc, type) => ({ ...acc, [type]: true }), {} as Record<LineType, boolean>)
@@ -112,34 +111,34 @@ export function useMapLogic() {
   const handleToggleLineType = useCallback((lineType: LineType, show: boolean) => {
     setLineVisibility(prev => ({ ...prev, [lineType]: show }));
     if (show && lineData[lineType].length > 0) {
-      drawLines(lineData[lineType], lineType, map, setSelectedObject);
+      drawLines(lineData[lineType], lineType, map, setSelectedObject, isDrawingMode);
     } else {
       removeLines(lineType, map);
       setSelectedObject(null);
     }
-  }, [lineData]);
+  }, [lineData, isDrawingMode]); // Add isDrawingMode to dependencies
 
   // Generic toggle function for any node type
   const handleToggleNodeType = useCallback((nodeType: NodeType, show: boolean) => {
     setNodeVisibility(prev => ({ ...prev, [nodeType]: show }));
     if (show && nodeData[nodeType].length > 0) {
-      addMarkers(map, nodeData[nodeType], nodeType, setSelectedObject);
+      addMarkers(map, nodeData[nodeType], nodeType, setSelectedObject, isDrawingMode);
     } else {
       removeMarkers(nodeType, map, nodeData);
       setSelectedObject(null);
     }
-  }, [nodeData]);
+  }, [nodeData, isDrawingMode]); // Add isDrawingMode to dependencies
 
   // Generic toggle function for any area type
   const handleToggleAreaType = useCallback((areaType: AreaType, show: boolean) => {
     setAreaVisibility(prev => ({ ...prev, [areaType]: show }));
     if (show && areaData[areaType].length > 0) {
-      drawAreas(areaData[areaType], areaType, map, setSelectedObject);
+      drawAreas(areaData[areaType], areaType, map, setSelectedObject, isDrawingMode);
     } else {
       removeAreas(areaType, map);
       setSelectedObject(null);
     }
-  }, [areaData]);
+  }, [areaData, isDrawingMode]); // Add isDrawingMode to dependencies
 
   const startGame = useCallback(async () => {
     setGameState('loading');
@@ -156,21 +155,21 @@ export function useMapLogic() {
       // Add markers for visible node types
       ENABLED_NODE_TYPES.forEach((nodeType) => {
         if (nodeVisibility[nodeType] && allNodes[nodeType].length > 0) {
-          addMarkers(map, allNodes[nodeType], nodeType, setSelectedObject);
+          addMarkers(map, allNodes[nodeType], nodeType, setSelectedObject, isDrawingMode);
         }
       });
 
       // Draw visible line types
       ENABLED_LINE_TYPES.forEach((lineType) => {
         if (lineVisibility[lineType] && allLines[lineType].length > 0) {
-          drawLines(allLines[lineType], lineType, map, setSelectedObject);
+          drawLines(allLines[lineType], lineType, map, setSelectedObject, isDrawingMode);
         }
       });
 
       // Draw visible areas
       ENABLED_AREA_TYPES.forEach((areaType) => {
         if (areaVisibility[areaType] && allAreas[areaType].length > 0) {
-          drawAreas(allAreas[areaType], areaType, map, setSelectedObject);
+          drawAreas(allAreas[areaType], areaType, map, setSelectedObject, isDrawingMode);
         }
       });
 
@@ -179,7 +178,7 @@ export function useMapLogic() {
       console.error('Failed to load game elements:', error);
       setGameState('idle');
     }
-  }, [coordinates, radius, lineVisibility, nodeVisibility, areaVisibility]);
+  }, [coordinates, radius, lineVisibility, nodeVisibility, areaVisibility, isDrawingMode]); // Add isDrawingMode
 
   const resetGame = useCallback(() => {
     setGameState('idle');
@@ -188,11 +187,6 @@ export function useMapLogic() {
     // Remove all line types from map
     ENABLED_LINE_TYPES.forEach(lineType => {
       removeLines(lineType, map);
-    });
-
-    // Remove all node types from map
-    ENABLED_NODE_TYPES.forEach(nodeType => {
-      removeMarkers(nodeType, map, nodeData);
     });
 
     // Remove all area types from map
@@ -208,9 +202,8 @@ export function useMapLogic() {
     setLineData(ENABLED_LINE_TYPES.reduce((acc, type) => ({ ...acc, [type]: [] }), {} as Record<LineType, GenericLine[]>));
     setAreaData(ENABLED_AREA_TYPES.reduce((acc, type) => ({ ...acc, [type]: [] }), {} as Record<AreaType, GenericArea[]>));
     
-    // Clear all polygons on reset
-    clearAllPolygons();
-  }, [map, clearAllPolygons]);
+    // Note: Don't call clearAllPolygons here - let the component handle it
+  }, [map]); // Remove clearAllPolygons from dependency
 
   return {
     // State

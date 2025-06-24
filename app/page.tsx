@@ -13,10 +13,26 @@ import { getWindDirectionText } from "@/lib/api/weatherApi";
 // Hooks
 import { useMapLogic } from "@/hooks/useMapLogic";
 import { usePolygonDrawing } from "@/hooks/usePolygonDrawing";
+import { useEffect, useRef, useCallback } from "react";
 
 import "mapbox-gl/dist/mapbox-gl.css";
 
 export default function Home() {
+  // First get polygon drawing hook
+  const mapRef = useRef<mapboxgl.Map | null>(null);
+  const {
+    isDrawingMode,
+    currentPolygon,
+    drawnPolygons,
+    showAreaTypeDialog,
+    pendingPolygon,
+    toggleDrawingMode,
+    handleAreaTypeSelect,
+    clearAllPolygons,
+    setIsDrawingMode,
+  } = usePolygonDrawing(mapRef);
+
+  // Then pass isDrawingMode to useMapLogic
   const {
     coordinates,
     locationInfo,
@@ -42,26 +58,28 @@ export default function Home() {
     handleToggleAreaType,
     map,
     marker,
-  } = useMapLogic();
+  } = useMapLogic(isDrawingMode); // Pass drawing mode here
 
-  const {
-    isDrawingMode,
-    currentPolygon,
-    drawnPolygons,
-    showAreaTypeDialog,
-    pendingPolygon,
-    toggleDrawingMode,
-    handleAreaTypeSelect,
-    clearAllPolygons,
-    setIsDrawingMode,
-  } = usePolygonDrawing(map);
+  // Sync map refs
+  useEffect(() => {
+    if (map.current) {
+      mapRef.current = map.current;
+    }
+  }, [map.current]);
+
+  // Clear selected object when entering drawing mode
+  useEffect(() => {
+    if (isDrawingMode && selectedObject) {
+      setSelectedObject(null);
+    }
+  }, [isDrawingMode, selectedObject, setSelectedObject]);
 
   // Combine both resets
-  const handleResetGame = () => {
-    resetGame();
-    clearAllPolygons();
-    setIsDrawingMode(false);
-  };
+  const handleResetGame = useCallback(() => {
+    resetGame(); // Reset game logic
+    clearAllPolygons(); // Clear polygons
+    setIsDrawingMode(false); // Exit drawing mode
+  }, [resetGame, clearAllPolygons, setIsDrawingMode]);
 
   return (
     <div className="w-full h-screen relative">
@@ -99,7 +117,7 @@ export default function Home() {
           radius={radius}
           setRadius={setRadius}
           onStartGame={startGame}
-          onResetGame={handleResetGame}
+          onResetGame={handleResetGame} // Use the combined reset function
         />
 
         {/* Drawing Controls - only show when playing */}
@@ -123,8 +141,8 @@ export default function Home() {
         getWindDirectionText={getWindDirectionText}
       />
 
-      {/* Detail Popups */}
-      {selectedObject && (
+      {/* Detail Popups - only show if not in drawing mode */}
+      {selectedObject && !isDrawingMode && (
         <div
           style={{
             position: "absolute",
