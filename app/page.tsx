@@ -10,6 +10,8 @@ import LineDetailsDialog from "@/components/dialogs/DetailsDialog";
 import DrawAreaTypeDialog from "@/components/dialogs/DrawAreaTypeDialog";
 import { getWindDirectionText } from "@/lib/api/weatherApi";
 import MapStyleSwitcher from "@/components/map/MapStyleSwitcher";
+import Map3DControls from "@/components/map/Map3DControls";
+import TerrainToggle from "@/components/map/TerrainToggle";
 
 // Hooks
 import { useMapLogic } from "@/hooks/useMapLogic";
@@ -64,6 +66,13 @@ export default function Home() {
     marker,
     mapStyle,
     handleMapStyleChange,
+    is3DEnabled,
+    toggle3D,
+    resetView,
+    rotateLeft,
+    rotateRight,
+    isTerrainEnabled,
+    toggleTerrain,
   } = useMapLogic(isDrawingMode); // Pass drawing mode here
 
   const t = useTranslations();
@@ -92,11 +101,11 @@ export default function Home() {
   // Redraw drawn polygons after map style changes with correct types
   useEffect(() => {
     if (!mapRef.current || drawnPolygons.length === 0) return;
-    
+
     // Add a small delay to ensure the map style has fully loaded
     const timeoutId = setTimeout(() => {
       drawnPolygons.forEach((polygon, index) => {
-        const areaType = polygonTypes[index] || 'rescue'; // Use stored type or fallback
+        const areaType = polygonTypes[index] || "rescue"; // Use stored type or fallback
         addCompletedPolygon(polygon, index, areaType, mapRef, t);
       });
     }, 100);
@@ -135,9 +144,6 @@ export default function Home() {
 
       {/* Top-right controls container */}
       <div className="absolute top-4 right-4 flex flex-col gap-4 z-10">
-        {/* Map Style Switcher */}
-        
-
         {/* Game Controls */}
         <GameControls
           appState={appState}
@@ -186,8 +192,26 @@ export default function Home() {
         </div>
       )}
 
-      <div className="absolute bottom-6 left-4 z-10">
-        <MapStyleSwitcher currentStyle={mapStyle} onChange={handleMapStyleChange} />
+      {/* Bottom-left controls container */}
+      <div className="absolute bottom-6 left-4 flex flex-col gap-2 z-10">
+        {/* Terrain Toggle and Reset View buttons - side by side */}
+        <div className="flex gap-2">
+          <TerrainToggle
+            isTerrainEnabled={isTerrainEnabled}
+            onToggle={toggleTerrain}
+            disabled={appState === "loading"}
+          />
+          <Map3DControls
+            onResetView={resetView}
+            disabled={appState === "loading"}
+          />
+        </div>
+
+        {/* Map Style Switcher */}
+        <MapStyleSwitcher
+          currentStyle={mapStyle}
+          onChange={handleMapStyleChange}
+        />
       </div>
 
       <DrawAreaTypeDialog

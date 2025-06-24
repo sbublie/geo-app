@@ -32,7 +32,7 @@ const ENABLED_LINE_TYPES: LineType[] = Object.keys(lineConfig) as LineType[];
 const ENABLED_NODE_TYPES: NodeType[] = Object.keys(nodeConfig) as NodeType[];
 const ENABLED_AREA_TYPES: AreaType[] = Object.keys(areaConfig) as AreaType[];
 
-export function useMapLogic(isDrawingMode: boolean = false) { // Accept as parameter
+export function useMapLogic(isDrawingMode: boolean = false) {
   const map = useRef<mapboxgl.Map | null>(null);
   const marker = useRef<mapboxgl.Marker | null>(null);
   const lastCircleParams = useRef<{ center: [number, number]; radius: number } | null>(null);
@@ -83,53 +83,135 @@ export function useMapLogic(isDrawingMode: boolean = false) { // Accept as param
   // Add map style state
   const [mapStyle, setMapStyle] = useState<string>('mapbox://styles/mapbox/streets-v12');
 
+  // Add 3D state
+  const [is3DEnabled, setIs3DEnabled] = useState(false);
+
+  // Add terrain state
+  const [isTerrainEnabled, setIsTerrainEnabled] = useState(false);
+
+  // Add the missing redrawAllLayers function
+  const redrawAllLayers = useCallback(() => {
+    if (!map.current) return;
+
+    // Remove all old markers before redrawing
+    removeAllMarkers();
+
+    // Redraw areas first (bottom layer)
+    ENABLED_AREA_TYPES.forEach((areaType) => {
+      if (areaVisibility[areaType] && areaData[areaType].length > 0) {
+        drawAreas(areaData[areaType], areaType, map, setSelectedObject, isDrawingMode);
+      }
+    });
+
+    // Redraw lines (middle layer)
+    ENABLED_LINE_TYPES.forEach((lineType) => {
+      if (lineVisibility[lineType] && lineData[lineType].length > 0) {
+        drawLines(lineData[lineType], lineType, map, setSelectedObject, isDrawingMode);
+      }
+    });
+
+    // Redraw markers (top layer)
+    ENABLED_NODE_TYPES.forEach((nodeType) => {
+      if (nodeVisibility[nodeType] && nodeData[nodeType].length > 0) {
+        addMarkers(map, nodeData[nodeType], nodeType, setSelectedObject, isDrawingMode);
+      }
+    });
+
+    // Redraw radius circle if game is active
+    if (appState === 'playing') {
+      updateCircle([coordinates.lng, coordinates.lat], radius, map, lastCircleParams);
+    }
+  }, [
+    areaVisibility, areaData, lineVisibility, lineData, nodeVisibility, nodeData,
+    coordinates, radius, appState, isDrawingMode
+  ]);
+
   // Add a handler to change the style
   const handleMapStyleChange = useCallback((newStyle: string) => {
     setMapStyle(newStyle);
     if (map.current) {
-      // Save current view state
+      // Save current view state including 3D
       const center = map.current.getCenter();
       const zoom = map.current.getZoom();
       const bearing = map.current.getBearing();
       const pitch = map.current.getPitch();
+      const currentTerrainEnabled = isTerrainEnabled;
 
       map.current.setStyle(newStyle);
 
       map.current.once('styledata', () => {
-        // Restore view state
+        // Restore view state including 3D
         map.current?.setCenter(center);
         map.current?.setZoom(zoom);
         map.current?.setBearing(bearing);
         map.current?.setPitch(pitch);
 
-        // Redraw all custom layers and markers here:
-        // Redraw polygons/areas
-        ENABLED_AREA_TYPES.forEach((areaType) => {
-          if (areaVisibility[areaType] && areaData[areaType].length > 0) {
-            drawAreas(areaData[areaType], areaType, map, setSelectedObject, isDrawingMode);
-          }
-        });
-        // Redraw lines
-        ENABLED_LINE_TYPES.forEach((lineType) => {
-          if (lineVisibility[lineType] && lineData[lineType].length > 0) {
-            drawLines(lineData[lineType], lineType, map, setSelectedObject, isDrawingMode);
-          }
-        });
-        // Remove all old markers before adding new ones!
-        removeAllMarkers();
-        // Redraw markers
-        ENABLED_NODE_TYPES.forEach((nodeType) => {
-          if (nodeVisibility[nodeType] && nodeData[nodeType].length > 0) {
-            addMarkers(map, nodeData[nodeType], nodeType, setSelectedObject, isDrawingMode);
-          }
-        });
+        // Update 3D state based on restored pitch
+        setIs3DEnabled(pitch > 0);
+
+        // Restore terrain if it was enabled
+        if (currentTerrainEnabled) {
+          map.current?.addSource('mapbox-dem', {
+            type: 'raster-dem',
+            url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
+            tileSize: 512,
+            maxzoom: 16,
+          });
+          map.current?.setTerrain({ 
+            source: 'mapbox-dem', 
+            exaggeration: 1.5 
+          });
+        }
+
+        // Redraw all layers
+        redrawAllLayers();
       });
     }
-  }, [
-    map, setMapStyle, areaVisibility, areaData, lineVisibility, lineData, nodeVisibility, nodeData,
-    ENABLED_AREA_TYPES, ENABLED_LINE_TYPES, ENABLED_NODE_TYPES,
-    setSelectedObject, isDrawingMode
-]);
+  }, [redrawAllLayers, isTerrainEnabled]);
+
+  // 3D Control functions
+  const toggle3D = useCallback(() => {
+    if (!map.current) return;
+    
+    const newPitch = is3DEnabled ? 0 : 60; // 0 = flat, 60 = 3D
+    
+    map.current.easeTo({
+      pitch: newPitch,
+      duration: 1000
+    });
+    
+    setIs3DEnabled(!is3DEnabled);
+  }, [is3DEnabled]);
+
+  const resetView = useCallback(() => {
+    if (!map.current) return;
+    
+    map.current.easeTo({
+      pitch: 0,
+      bearing: 0,
+      duration: 1000
+    });
+    
+    setIs3DEnabled(false);
+  }, []);
+
+  const rotateLeft = useCallback(() => {
+    if (!map.current) return;
+    
+    map.current.easeTo({
+      bearing: map.current.getBearing() - 45,
+      duration: 500
+    });
+  }, []);
+
+  const rotateRight = useCallback(() => {
+    if (!map.current) return;
+    
+    map.current.easeTo({
+      bearing: map.current.getBearing() + 45,
+      duration: 500
+    });
+  }, []);
 
   // Update handleMapLoad to use the selected style
   const handleMapLoad = useCallback((mapRef: React.MutableRefObject<mapboxgl.Map | null>) => {
@@ -171,7 +253,7 @@ export function useMapLogic(isDrawingMode: boolean = false) { // Accept as param
       removeLines(lineType, map);
       setSelectedObject(null);
     }
-  }, [lineData, isDrawingMode]); // Add isDrawingMode to dependencies
+  }, [lineData, isDrawingMode]);
 
   // Generic toggle function for any node type
   const handleToggleNodeType = useCallback((nodeType: NodeType, show: boolean) => {
@@ -182,7 +264,7 @@ export function useMapLogic(isDrawingMode: boolean = false) { // Accept as param
       removeMarkers(nodeType, map, nodeData);
       setSelectedObject(null);
     }
-  }, [nodeData, isDrawingMode]); // Add isDrawingMode to dependencies
+  }, [nodeData, isDrawingMode]);
 
   // Generic toggle function for any area type
   const handleToggleAreaType = useCallback((areaType: AreaType, show: boolean) => {
@@ -193,7 +275,7 @@ export function useMapLogic(isDrawingMode: boolean = false) { // Accept as param
       removeAreas(areaType, map);
       setSelectedObject(null);
     }
-  }, [areaData, isDrawingMode]); // Add isDrawingMode to dependencies
+  }, [areaData, isDrawingMode]);
 
   const startGame = useCallback(async () => {
     setGameState('loading');
@@ -233,7 +315,7 @@ export function useMapLogic(isDrawingMode: boolean = false) { // Accept as param
       console.error('Failed to load game elements:', error);
       setGameState('idle');
     }
-  }, [coordinates, radius, lineVisibility, nodeVisibility, areaVisibility, isDrawingMode]); // Add isDrawingMode
+  }, [coordinates, radius, lineVisibility, nodeVisibility, areaVisibility, isDrawingMode]);
 
   const resetGame = useCallback(() => {
     setGameState('idle');
@@ -256,9 +338,36 @@ export function useMapLogic(isDrawingMode: boolean = false) { // Accept as param
     setNodeData(ENABLED_NODE_TYPES.reduce((acc, type) => ({ ...acc, [type]: [] }), {} as Record<NodeType, GenericNode[]>));
     setLineData(ENABLED_LINE_TYPES.reduce((acc, type) => ({ ...acc, [type]: [] }), {} as Record<LineType, GenericLine[]>));
     setAreaData(ENABLED_AREA_TYPES.reduce((acc, type) => ({ ...acc, [type]: [] }), {} as Record<AreaType, GenericArea[]>));
-    
-    // Note: Don't call clearAllPolygons here - let the component handle it
-  }, [map]); // Remove clearAllPolygons from dependency
+  }, []);
+
+  // Add terrain toggle function
+  const toggleTerrain = useCallback(() => {
+    if (!map.current) return;
+
+    if (isTerrainEnabled) {
+      // Remove terrain
+      map.current.setTerrain(null);
+      if (map.current.getSource('mapbox-dem')) {
+        map.current.removeSource('mapbox-dem');
+      }
+      setIsTerrainEnabled(false);
+    } else {
+      // Add terrain
+      if (!map.current.getSource('mapbox-dem')) {
+        map.current.addSource('mapbox-dem', {
+          type: 'raster-dem',
+          url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
+          tileSize: 512,
+          maxzoom: 16,
+        });
+      }
+      map.current.setTerrain({ 
+        source: 'mapbox-dem', 
+        exaggeration: 1.5 
+      });
+      setIsTerrainEnabled(true);
+    }
+  }, [isTerrainEnabled]);
 
   return {
     // State
@@ -299,6 +408,15 @@ export function useMapLogic(isDrawingMode: boolean = false) { // Accept as param
     // Map style
     mapStyle,
     handleMapStyleChange,
+    // 3D state
+    is3DEnabled,
+    toggle3D,
+    resetView,
+    rotateLeft,
+    rotateRight,
+    // Terrain state
+    isTerrainEnabled,
+    toggleTerrain,
   };
 }
 
