@@ -35,7 +35,7 @@ export default function MapContainer({
         container: mapContainer.current,
         style: mapbox_style as any,
         center: defaultLocation,
-        zoom: 13
+        zoom: 16
       });
 
       map.current.on('load', () => {

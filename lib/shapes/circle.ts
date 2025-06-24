@@ -56,7 +56,7 @@ export function updateCircle(
     source: 'circle-source',
     paint: {
       'fill-color': '#ff0000',
-      'fill-opacity': 0.05
+      'fill-opacity': 0.03
     }
   });
 
@@ -67,7 +67,7 @@ export function updateCircle(
     paint: {
       'line-color': '#ff0000',
       'line-width': 2,
-      'line-opacity': 0.8
+      'line-opacity': 0.01
     }
   });
 };

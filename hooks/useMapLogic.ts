@@ -152,6 +152,13 @@ export function useMapLogic(isDrawingMode: boolean = false) { // Accept as param
       setNodeData(allNodes);
       setAreaData(allAreas);
 
+      // Draw visible areas
+      ENABLED_AREA_TYPES.forEach((areaType) => {
+        if (areaVisibility[areaType] && allAreas[areaType].length > 0) {
+          drawAreas(allAreas[areaType], areaType, map, setSelectedObject, isDrawingMode);
+        }
+      });
+
       // Add markers for visible node types
       ENABLED_NODE_TYPES.forEach((nodeType) => {
         if (nodeVisibility[nodeType] && allNodes[nodeType].length > 0) {
@@ -163,13 +170,6 @@ export function useMapLogic(isDrawingMode: boolean = false) { // Accept as param
       ENABLED_LINE_TYPES.forEach((lineType) => {
         if (lineVisibility[lineType] && allLines[lineType].length > 0) {
           drawLines(allLines[lineType], lineType, map, setSelectedObject, isDrawingMode);
-        }
-      });
-
-      // Draw visible areas
-      ENABLED_AREA_TYPES.forEach((areaType) => {
-        if (areaVisibility[areaType] && allAreas[areaType].length > 0) {
-          drawAreas(allAreas[areaType], areaType, map, setSelectedObject, isDrawingMode);
         }
       });
 
