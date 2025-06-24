@@ -14,16 +14,17 @@ import { drawLines, removeLines, GenericLineFeature } from "@/lib/shapes/lines";
 import WeatherData from '@/types/WeatherData';
 import { usePolygonDrawing } from '@/hooks/usePolygonDrawing';
 import { LineType } from '@/types/LineConfig';
+import { NodeType } from '@/types/NodeConfig';
 import { lineConfig } from '@/lib/config/lineConfig';
 import { getAllInfrastructureNodes } from '@/lib/api/fetchOsmNodes';
 import { nodeConfig } from '@/lib/config/nodeConfig';
-import { addMarkers, removeAllMarkers } from '@/lib/shapes/marker';
+import { addMarkers, removeAllMarkers, removeMarkers } from '@/lib/shapes/marker';
 import GenericNode from '@/types/GenericNode';
 import { SelectedNodeWithPoint } from '@/lib/shapes/marker';
 import { SelectedLineWithPoint } from '@/lib/shapes/lines';
 
 const ENABLED_LINE_TYPES: LineType[] = Object.keys(lineConfig) as LineType[];
-const nodeTypes = Object.keys(nodeConfig) as Array<keyof typeof nodeConfig>;
+const ENABLED_NODE_TYPES: NodeType[] = Object.keys(nodeConfig) as NodeType[];
 
 export function useMapLogic() {
   const map = useRef<mapboxgl.Map | null>(null);
@@ -49,12 +50,20 @@ export function useMapLogic() {
     ENABLED_LINE_TYPES.reduce((acc, type) => ({ ...acc, [type]: true }), {} as Record<LineType, boolean>)
   );
   
+  // Generic node visibility state
+  const [nodeVisibility, setNodeVisibility] = useState<Record<NodeType, boolean>>(
+    ENABLED_NODE_TYPES.reduce((acc, type) => ({ ...acc, [type]: true }), {} as Record<NodeType, boolean>)
+  );
+  
   // Generic line data storage
   const [lineData, setLineData] = useState<Record<LineType, GenericLine[]>>(
     ENABLED_LINE_TYPES.reduce((acc, type) => ({ ...acc, [type]: [] }), {} as Record<LineType, GenericLine[]>)
   );
 
-  const [nodeData, setNodeData] = useState<Record<string, any>>({});
+  // Generic node data storage
+  const [nodeData, setNodeData] = useState<Record<NodeType, GenericNode[]>>(
+    ENABLED_NODE_TYPES.reduce((acc, type) => ({ ...acc, [type]: [] }), {} as Record<NodeType, GenericNode[]>)
+  );
 
   const handleMapLoad = useCallback((mapRef: React.MutableRefObject<mapboxgl.Map | null>) => {
     map.current = mapRef.current;
@@ -87,19 +96,23 @@ export function useMapLogic() {
   const handleToggleLineType = useCallback((lineType: LineType, show: boolean) => {
     setLineVisibility(prev => ({ ...prev, [lineType]: show }));
     if (show && lineData[lineType].length > 0) {
-      drawLines(lineData[lineType], lineType , map, setSelectedObject);
+      drawLines(lineData[lineType], lineType, map, setSelectedObject);
     } else {
       removeLines(lineType, map);
       setSelectedObject(null);
     }
   }, [lineData]);
 
-  // Create specific handlers for each enabled line type (optional, for legacy compatibility)
-  const lineTypeHandlers = ENABLED_LINE_TYPES.reduce((handlers, lineType) => {
-    handlers[`handleToggle${lineType.charAt(0).toUpperCase()}${lineType.slice(1)}Lines`] = 
-      (show: boolean) => handleToggleLineType(lineType, show);
-    return handlers;
-  }, {} as Record<string, (show: boolean) => void>);
+  // Generic toggle function for any node type
+  const handleToggleNodeType = useCallback((nodeType: NodeType, show: boolean) => {
+    setNodeVisibility(prev => ({ ...prev, [nodeType]: show }));
+    if (show && nodeData[nodeType].length > 0) {
+      addMarkers(map, nodeData[nodeType], nodeType, setSelectedObject);
+    } else {
+      removeMarkers(nodeType, map, nodeData);
+      setSelectedObject(null);
+    }
+  }, [nodeData]);
 
   const startGame = useCallback(async () => {
     setGameState('loading');
@@ -110,9 +123,11 @@ export function useMapLogic() {
       setLineData(allLines);
       setNodeData(allNodes);
 
-      // Add markers for each node type
-      nodeTypes.forEach((nodeType) => {
-        addMarkers(map, allNodes[nodeType], nodeType, setSelectedObject);
+      // Add markers for visible node types
+      ENABLED_NODE_TYPES.forEach((nodeType) => {
+        if (nodeVisibility[nodeType] && allNodes[nodeType].length > 0) {
+          addMarkers(map, allNodes[nodeType], nodeType, setSelectedObject);
+        }
       });
 
       // Draw visible line types
@@ -127,7 +142,7 @@ export function useMapLogic() {
       console.error('Failed to load game elements:', error);
       setGameState('idle');
     }
-  }, [coordinates, radius, lineVisibility, lineData]);
+  }, [coordinates, radius, lineVisibility, nodeVisibility]);
 
   const resetGame = useCallback(() => {
     setGameState('idle');
@@ -138,17 +153,16 @@ export function useMapLogic() {
       removeLines(lineType, map);
     });
 
-    // Remove ALL markers at once (simpler approach)
+    // Remove ALL markers at once
     removeAllMarkers();
 
-    // Clear node data
-    setNodeData({});
-    // Clear all line data
+    // Clear node and line data
+    setNodeData(ENABLED_NODE_TYPES.reduce((acc, type) => ({ ...acc, [type]: [] }), {} as Record<NodeType, GenericNode[]>));
     setLineData(ENABLED_LINE_TYPES.reduce((acc, type) => ({ ...acc, [type]: [] }), {} as Record<LineType, GenericLine[]>));
+    
     // Clear all polygons on reset
     clearAllPolygons();
   }, [map, clearAllPolygons]);
-
 
   return {
     // State
@@ -166,14 +180,17 @@ export function useMapLogic() {
     lineVisibility,
     lineData,
     enabledLineTypes: ENABLED_LINE_TYPES,
+    // Generic node state
+    nodeVisibility,
+    nodeData,
+    enabledNodeTypes: ENABLED_NODE_TYPES,
     // Handlers
     handleMapLoad,
     handleMarkerDragEnd,
     startGame,
     resetGame,
     handleToggleLineType,
-    // Specific line type handlers for backward compatibility
-    ...lineTypeHandlers,
+    handleToggleNodeType,
     // Refs
     map,
     marker,

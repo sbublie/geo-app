@@ -1,7 +1,7 @@
 
 import React from 'react';
 import * as turf from '@turf/turf';
-import { areaTypes } from '@/lib/config/areaTypes';
+import { drawAreaTypes } from '@/lib/config/drawAreaTypes';
 import { useTranslations } from 'next-intl';
 
 // Function to update polygon preview
@@ -133,7 +133,7 @@ export function addCompletedPolygon(points: [number, number][], index: number, a
     const centroid = turf.centroid(polygonData);
 
     // Get area type info
-    const typeInfo = areaTypes.find(type => type.value === areaType) || areaTypes.find(type => type.value === 'other')!;
+    const typeInfo = drawAreaTypes.find(type => type.value === areaType) || drawAreaTypes.find(type => type.value === 'other')!;
 
     const sourceId = `completed-polygon-${index}`;
 

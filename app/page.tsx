@@ -7,7 +7,7 @@ import DrawingControls from "@/components/drawing/DrawingControls";
 import InfoPanels from "@/components/info/InfoPanels";
 import FilterMenu from "@/components/map/FilterMenu";
 import LineDetailsDialog from "@/components/dialogs/DetailsDialog";
-import AreaTypeDialog from "@/components/dialogs/AreaTypeDialog";
+import DrawAreaTypeDialog from "@/components/dialogs/DrawAreaTypeDialog";
 import { getWindDirectionText } from "@/lib/api/weatherApi";
 
 // Hooks
@@ -29,11 +29,14 @@ export default function Home() {
     setSelectedObject,
     lineVisibility,
     enabledLineTypes,
+    nodeVisibility,
+    enabledNodeTypes,
     handleMapLoad,
     handleMarkerDragEnd,
     startGame,
     resetGame,
     handleToggleLineType,
+    handleToggleNodeType,
     map,
     marker,
   } = useMapLogic();
@@ -75,6 +78,9 @@ export default function Home() {
             lineVisibility={lineVisibility}
             enabledLineTypes={enabledLineTypes}
             onToggleLineType={handleToggleLineType}
+            nodeVisibility={nodeVisibility}
+            enabledNodeTypes={enabledNodeTypes}
+            onToggleNodeType={handleToggleNodeType}
           />
         </div>
       )}
@@ -129,7 +135,7 @@ export default function Home() {
         </div>
       )}
 
-      <AreaTypeDialog
+      <DrawAreaTypeDialog
         showAreaTypeDialog={showAreaTypeDialog}
         setShowAreaTypeDialog={() => {}}
         pendingPolygon={pendingPolygon}

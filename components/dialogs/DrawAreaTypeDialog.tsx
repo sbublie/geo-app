@@ -4,10 +4,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from '@/components/ui/button';
 import * as turf from '@turf/turf';
 
-import { areaTypes } from '@/lib/config/areaTypes';
+import { drawAreaTypes } from '@/lib/config/drawAreaTypes';
 import { useTranslations } from 'next-intl';
 
-export default function AreaTypeDialog({
+export default function DrawAreaTypeDialog({
     showAreaTypeDialog,
     setShowAreaTypeDialog,
     pendingPolygon,
@@ -68,7 +68,7 @@ export default function AreaTypeDialog({
                         <label className="text-sm font-medium">{t("areas.polygonType")}</label>
                         <div className="border rounded-lg p-2 max-h-[300px] overflow-y-auto">
                             <div className="grid gap-1">
-                                {areaTypes.map((type) => (
+                                {drawAreaTypes.map((type) => (
                                     <Button
                                         key={type.value}
                                         variant={selectedType === type.value ? "default" : "ghost"}

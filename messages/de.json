@@ -124,6 +124,8 @@
     "pipelineLines": "Pipeline",
     "waterwayLines": "Wasserwege",
     "railwayLines": "Eisenbahnlinien",
-    "highwayLines": "Straßen"
+    "highwayLines": "Straßen",
+    "treeNodes": "Bäume",
+    "powerNodes": "Stromknoten"
   }
 }

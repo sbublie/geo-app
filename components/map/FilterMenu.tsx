@@ -11,19 +11,27 @@ import {
 import { Filter } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { LineType } from '@/types/LineConfig';
+import { NodeType } from '@/types/NodeConfig';
 import { lineConfig } from '@/lib/config/lineConfig';
-
+import { nodeConfig } from '@/lib/config/nodeConfig';
 
 interface FilterMenuProps {
   lineVisibility: Record<LineType, boolean>;
   enabledLineTypes: LineType[];
   onToggleLineType: (lineType: LineType, show: boolean) => void;
+
+  nodeVisibility: Record<NodeType, boolean>;
+  enabledNodeTypes: NodeType[];
+  onToggleNodeType: (nodeType: NodeType, show: boolean) => void;
 }
 
 export default function FilterMenu({
   lineVisibility,
   enabledLineTypes,
   onToggleLineType,
+  nodeVisibility,
+  enabledNodeTypes,
+  onToggleNodeType,
 }: FilterMenuProps) {
   const t = useTranslations();
   const [isOpen, setIsOpen] = useState(false);
@@ -40,9 +48,11 @@ export default function FilterMenu({
           {t('filters.title')}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56 bg-white ml-8">
+      <DropdownMenuContent className="w-56 bg-white ml-4">
         <DropdownMenuLabel>{t('filters.mapElements')}</DropdownMenuLabel>
         <DropdownMenuSeparator />
+
+        {/* Line types */}
         <div className="p-2 space-y-3">
           {enabledLineTypes.map((lineType) => {
             const config = lineConfig[lineType];
@@ -60,12 +70,42 @@ export default function FilterMenu({
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center gap-2 cursor-pointer"
                 >
                   <IconComponent size={16} className={colorClass} />
-                  {t(`filters.${lineType}Lines`) || ""}
+                  {t(`filters.${lineType}Lines`) || lineType}
                 </label>
               </div>
             );
           })}
         </div>
+
+        {/* Node types */}
+        {enabledNodeTypes.length > 0 && (
+          <>
+            <DropdownMenuSeparator />
+            <div className="p-2 space-y-3">
+              {enabledNodeTypes.map((nodeType) => {
+                const config = nodeConfig[nodeType];
+                const IconComponent = config.icon || Filter;
+                const colorClass = config.colorClass || 'text-gray-600';
+                return (
+                  <div key={nodeType} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`${nodeType}-nodes`}
+                      checked={nodeVisibility[nodeType] || false}
+                      onCheckedChange={(show) => onToggleNodeType(nodeType, !!show)}
+                    />
+                    <label
+                      htmlFor={`${nodeType}-nodes`}
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center gap-2 cursor-pointer"
+                    >
+                      <IconComponent size={16} className={colorClass} />
+                      {t(`filters.${nodeType}Nodes`) || nodeType}
+                    </label>
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
