@@ -178,7 +178,7 @@ export function addCompletedPolygon(points: [number, number][], index: number, a
         },
         properties: {
             area: areaText,
-            type: t(`${typeInfo.label_key}`)
+            type: t(`${typeInfo.labelKey}`)
         }
     };
 

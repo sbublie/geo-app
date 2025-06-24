@@ -12,7 +12,7 @@ export function getAvailableLineTypes(): Array<{ key: LineType; config: LineConf
 export const lineConfig: Record<LineType, LineConfig> = {
   railway: {
     type: "railway",
-    type_values: ["rail", "light_rail", "subway", "tram"],
+    tagValues: ["rail", "light_rail", "subway", "tram"],
     layerId: "railway-lines-layer",
     sourceId: "railway-lines",
     colors: {
@@ -30,17 +30,17 @@ export const lineConfig: Record<LineType, LineConfig> = {
     },
     tagKey: "railway",
     highlightFields: [
-      { key: "railway", label_key: "type" },
-      { key: "service", label_key: "service" },
-      { key: "electrified", label_key: "electrified" },
-      { key: "maxspeed", label_key: "maxspeed" }
+      { key: "railway", labelKey: "type" },
+      { key: "service", labelKey: "service" },
+      { key: "electrified", labelKey: "electrified" },
+      { key: "maxspeed", labelKey: "maxspeed" }
     ],
     icon: Train,
     colorClass: "text-green-600"
   },
   power: {
     type: "power",
-    type_values: ["line", "cable", "minor_line"],
+    tagValues: ["line", "cable", "minor_line"],
     layerId: "power-lines-layer",
     sourceId: "power-lines",
     colors: {
@@ -57,15 +57,15 @@ export const lineConfig: Record<LineType, LineConfig> = {
     },
     tagKey: "power",
     highlightFields: [
-      { key: "power", label_key: "type" },
-      { key: "voltage", label_key: "voltage" }
+      { key: "power", labelKey: "type" },
+      { key: "voltage", labelKey: "voltage" }
     ],
     icon: Zap,
     colorClass: "text-red-600"
   },
   highway: {
     type: "highway",
-    type_values: ["motorway", "trunk", "primary", "secondary", "tertiary", "track", "cycleway", "residential"],
+    tagValues: ["motorway", "trunk", "primary", "secondary", "tertiary", "track", "cycleway", "residential"],
     layerId: "highway-lines-layer",
     sourceId: "highway-lines",
     colors: {
@@ -86,15 +86,15 @@ export const lineConfig: Record<LineType, LineConfig> = {
     },
     tagKey: "highway",
     highlightFields: [
-      { key: "highway", label_key: "type" },
-      { key: "maxspeed", label_key: "maxspeed" }
+      { key: "highway", labelKey: "type" },
+      { key: "maxspeed", labelKey: "maxspeed" }
     ],
     icon: Car,
     colorClass: "text-yellow-300"
   },
   waterway: {
     type: "waterway",
-    type_values: ["river", "stream", "canal", "drain"],
+    tagValues: ["river", "stream", "canal", "drain"],
     layerId: "waterway-lines-layer",
     sourceId: "waterway-lines",
     colors: {
@@ -113,15 +113,15 @@ export const lineConfig: Record<LineType, LineConfig> = {
     },
     tagKey: "waterway",
     highlightFields: [
-      { key: "waterway", label_key: "type" },
-      { key: "width", label_key: "width" }
+      { key: "waterway", labelKey: "type" },
+      { key: "width", labelKey: "width" }
     ],
     icon: Waves,
     colorClass: "text-blue-400"
   },
   pipeline: {
     type: "pipeline",
-    //type_values: [],
+    //tagValues: [],
     layerId: "pipeline-lines-layer",
     sourceId: "pipeline-lines",
     colors: {
@@ -134,8 +134,8 @@ export const lineConfig: Record<LineType, LineConfig> = {
     },
     tagKey: "man_made",
     highlightFields: [
-      { key: "man_made", label_key: "type" },
-      { key: "substance", label_key: "substance" }
+      { key: "man_made", labelKey: "type" },
+      { key: "substance", labelKey: "substance" }
     ],
     icon: Circle,
     colorClass: "text-grey-600"

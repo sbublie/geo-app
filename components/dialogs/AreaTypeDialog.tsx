@@ -87,7 +87,7 @@ export default function AreaTypeDialog({
                                                 style={{ backgroundColor: type.color }}
                                             ></div>
                                             <span className="text-sm font-medium transition-colors duration-200">
-                                                {t(`${type.label_key}`)|| ""} 
+                                                {t(`${type.labelKey}`)|| ""} 
                                             </span>
                                         </div>
                                     </Button>

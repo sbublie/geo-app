@@ -21,7 +21,7 @@ const enabledTypes = Object.keys(nodeConfig) as NodeType[];
   for (const type of enabledTypes) {
     const config = nodeConfig[type];
     if (!config) continue;
-    const values = config.type_values?.join('|') || '';
+    const values = config.tagValues?.join('|') || '';
     query += `
       node["${config.tagKey}"~"${values}"](${south},${west},${north},${east});
       way["${config.tagKey}"~"${values}"](${south},${west},${north},${east});
@@ -70,7 +70,7 @@ function splitNodesByType(
         if (
           config &&
           element.tags[config.tagKey] &&
-          (!config.type_values || config.type_values.includes(element.tags[config.tagKey]))
+          (!config.tagValues || config.tagValues.includes(element.tags[config.tagKey]))
         ) {
           let coordinates: [number, number];
           

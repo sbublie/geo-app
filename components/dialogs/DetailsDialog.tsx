@@ -69,14 +69,14 @@ export default function DetailsDialog({ selectedObject, onClose }: DetailsDialog
       <SelectSeparator className="mb-3 h-[4px]" />
 
       <div className="space-y-2">
-        {highlightFields.map(({ key, label_key, color }) =>
+        {highlightFields.map(({ key, labelKey, color }) =>
           properties[key] ? (
             <div
               key={key}
               className={`text-sm ${color ? `bg-${color}-50` : ""} rounded `}
             >
               <span className={`font-semibold ${color ? `text-${color}-800` : ""}`}>
-                {t(`${type}.${label_key}`) || label_key}:
+                {t(`${type}.${labelKey}`) || labelKey}:
               </span>{" "}
               <span className={`${color ? `text-${color}-700 font-bold` : ""}`}>
                 {properties[key]}

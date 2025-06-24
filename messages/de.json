@@ -106,6 +106,12 @@
         "height": "Höhe",
         "diameter": "Durchmesser",
         "health": "Gesundheit"
+      },
+      "power": {
+        "title": "Strommast",
+        "type": "Typ",
+        "voltage": "Spannung",
+        "operator": "Betrieber"
       }
     }
   },

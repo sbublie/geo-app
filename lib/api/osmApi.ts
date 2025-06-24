@@ -23,8 +23,8 @@ export async function getInfrastructureLinesInArea<T extends LineType>(
   const query = `
     [out:json][timeout:25];
     (
-      way["${config.tagKey}"~"${config.type_values?.join("|")}"](${south},${west},${north},${east});
-      relation["${config.tagKey}"~"${config.type_values?.join("|")}"](${south},${west},${north},${east});
+      way["${config.tagKey}"~"${config.tagValues?.join("|")}"](${south},${west},${north},${east});
+      relation["${config.tagKey}"~"${config.tagValues?.join("|")}"](${south},${west},${north},${east});
     );
     out geom;
   `;
@@ -112,7 +112,7 @@ export async function getAllInfrastructureLines(
   for (const type of enabledTypes) {
     const config = lineConfig[type];
     if (!config) continue;
-    const values = config.type_values?.join('|') || '';
+    const values = config.tagValues?.join('|') || '';
     query += `
       way["${config.tagKey}"~"${values}"](${south},${west},${north},${east});
       relation["${config.tagKey}"~"${values}"](${south},${west},${north},${east});
@@ -165,7 +165,7 @@ function splitLinesByType(
         if (
           config &&
           element.tags[config.tagKey] &&
-          (!config.type_values || config.type_values.includes(element.tags[config.tagKey]))
+          (!config.tagValues || config.tagValues.includes(element.tags[config.tagKey]))
         ) {
           const coordinates = element.geometry.map(coor => [coor.lon, coor.lat]);
           if (coordinates.length > 1) {
