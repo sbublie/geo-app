@@ -78,7 +78,9 @@ export const lineConfig: Record<LineType, LineConfig> = {
     tagKey: "highway",
     highlightFields: [
       { key: "highway", labelKey: "type" },
-      { key: "maxspeed", labelKey: "maxspeed" }
+      { key: "maxspeed", labelKey: "maxspeed" },
+      { key: "width", labelKey: "width" },
+      { key: "surface", labelKey: "surface" }
     ],
     icon: Car,
     colorClass: "text-yellow-300"
@@ -109,19 +111,20 @@ export const lineConfig: Record<LineType, LineConfig> = {
   },
   pipeline: {
     //tagValues: [],
-    
     colors: {
-      pipeline: "#747474",
+      pipeline: "#f5c7c7",
       default: "#747474"
     },
     widths: {
-      pipeline: 2,
-      default: 2
+      pipeline: 6,
+      default: 6
     },
     tagKey: "man_made",
     highlightFields: [
       { key: "man_made", labelKey: "type" },
-      { key: "substance", labelKey: "substance" }
+      { key: "substance", labelKey: "substance" },
+      { key: "diameter", labelKey: "diameter" },
+      { key: "location", labelKey: "location" }
     ],
     icon: Circle,
     colorClass: "text-grey-600"

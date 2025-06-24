@@ -120,6 +120,10 @@
           "location": "Lage"
         },
         "tagValues": {
+          "pipeline": "Pipeline",
+          "operator": "Betrieber",
+          "underground": "Unterirdisch",
+          "above_ground": "Überirdisch",
           "oil": "Öl",
           "gas": "Gas",
           "water": "Wasser"
@@ -148,7 +152,9 @@
           "surface": "Oberfläche",
           "lanes": "Spuren",
           "maxspeed": "Max. Geschwindigkeit",
-          "oneway": "Einbahnstraße"
+          "oneway": "Einbahnstraße",
+          "width": "Breite"
+
         },
         "tagValues": {
           "motorway": "Autobahn",
@@ -162,7 +168,11 @@
           "cycleway": "Fahrradweg",
           "track": "Fahrweg",
           "path": "Pfad",
-          "steps": "Treppe"
+          "steps": "Treppe",
+          "asphalt": "Asphalt",
+          "gravel": "Kies",
+          "paved": "Pflaster",
+          "unpaved": "Unbefestigt"
         }
       }
     },
