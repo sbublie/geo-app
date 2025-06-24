@@ -161,8 +161,20 @@ export function addCompletedPolygon(points: [number, number][], index: number, a
     const areaInKm2 = area / 1000000; // Convert from m² to km²
     const centroid = turf.centroid(polygonData);
 
-    // Get area type info
-    const typeInfo = drawAreaTypes.find(type => type.value === areaType) || drawAreaTypes.find(type => type.value === 'other')!;
+    // Get area type info with better error handling
+    const typeInfo = drawAreaTypes.find(type => type.value === areaType);
+    if (!typeInfo) {
+        console.warn(`Area type "${areaType}" not found, using default`);
+        // Use a fallback type
+        const fallbackType = drawAreaTypes.find(type => type.value === 'rescue') || drawAreaTypes[0];
+        if (!fallbackType) {
+            console.error('No fallback area type available');
+            return;
+        }
+        // Use the fallback but continue execution
+        addCompletedPolygon(points, index, fallbackType.value, map, t);
+        return;
+    }
 
     map.current.addSource(sourceId, {
         type: 'geojson',
@@ -202,7 +214,7 @@ export function addCompletedPolygon(points: [number, number][], index: number, a
             area: areaInKm2 < 0.01
                 ? `${Math.round(area)} m²`
                 : `${areaInKm2.toFixed(2)} km²`,
-            type: t(`${typeInfo.labelKey}`)
+            type: t(`${typeInfo.labelKey}`) || typeInfo.labelKey
         }
     };
 
@@ -243,12 +255,11 @@ export function addCompletedPolygon(points: [number, number][], index: number, a
         paint: {
             'circle-color': '#ffffff',
             'circle-opacity': 0.9,
-            'circle-radius': 35, // Made bigger to accommodate type text
+            'circle-radius': 35,
             'circle-stroke-color': typeInfo.color,
             'circle-stroke-width': 3
         }
     }, labelTextLayerId); // Insert below text layer
-
 };
 
 // Function to clear polygon preview

@@ -33,6 +33,7 @@ export default function Home() {
     handleAreaTypeSelect,
     clearAllPolygons,
     setIsDrawingMode,
+    polygonTypes,
   } = usePolygonDrawing(mapRef);
 
   // Then pass isDrawingMode to useMapLogic
@@ -88,14 +89,20 @@ export default function Home() {
     setIsDrawingMode(false); // Exit drawing mode
   }, [resetGame, clearAllPolygons, setIsDrawingMode]);
 
-  // Redraw drawn polygons after map style changes
+  // Redraw drawn polygons after map style changes with correct types
   useEffect(() => {
-    if (!mapRef.current) return;
-/*     drawnPolygons.forEach((polygon, index) => {
+    if (!mapRef.current || drawnPolygons.length === 0) return;
+    
+    // Add a small delay to ensure the map style has fully loaded
+    const timeoutId = setTimeout(() => {
+      drawnPolygons.forEach((polygon, index) => {
+        const areaType = polygonTypes[index] || 'rescue'; // Use stored type or fallback
+        addCompletedPolygon(polygon, index, areaType, mapRef, t);
+      });
+    }, 100);
 
-      addCompletedPolygon(polygon, index, 'rescue', mapRef, t);
-    }); */
-  }, [mapStyle]); // Redraw when mapStyle changes
+    return () => clearTimeout(timeoutId);
+  }, [mapStyle, drawnPolygons, polygonTypes, t]); // Include all dependencies
 
   return (
     <div className="w-full h-screen relative">
@@ -106,7 +113,7 @@ export default function Home() {
         coordinates={coordinates}
         radius={radius}
         markerRef={marker}
-        mapStyle={mapStyle} // <-- pass the style
+        mapStyle={mapStyle}
       />
 
       {/* Filter Menu */}
@@ -137,7 +144,7 @@ export default function Home() {
           radius={radius}
           setRadius={setRadius}
           onStartGame={startGame}
-          onResetGame={handleResetGame} // Use the combined reset function
+          onResetGame={handleResetGame}
         />
 
         {/* Drawing Controls - only show when playing */}
