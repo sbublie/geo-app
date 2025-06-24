@@ -12,7 +12,6 @@ import createBoundingBoxFromCenter from '@/lib/shapes/boundingBox';
 import GenericLine from '@/types/GenericLine';
 import { drawLines, removeLines, GenericLineFeature } from "@/lib/shapes/lines";
 import WeatherData from '@/types/WeatherData';
-import { usePolygonDrawing } from '@/hooks/usePolygonDrawing';
 import { LineType } from '@/types/LineConfig';
 import { NodeType } from '@/types/NodeConfig';
 import { lineConfig } from '@/lib/config/lineConfig';
@@ -83,9 +82,6 @@ export function useMapLogic(isDrawingMode: boolean = false) {
   // Add map style state
   const [mapStyle, setMapStyle] = useState<string>('mapbox://styles/mapbox/streets-v12');
 
-  // Add 3D state
-  const [is3DEnabled, setIs3DEnabled] = useState(false);
-
   // Add terrain state
   const [isTerrainEnabled, setIsTerrainEnabled] = useState(false);
 
@@ -146,9 +142,6 @@ export function useMapLogic(isDrawingMode: boolean = false) {
         map.current?.setBearing(bearing);
         map.current?.setPitch(pitch);
 
-        // Update 3D state based on restored pitch
-        setIs3DEnabled(pitch > 0);
-
         // Restore terrain if it was enabled
         if (currentTerrainEnabled) {
           map.current?.addSource('mapbox-dem', {
@@ -169,20 +162,6 @@ export function useMapLogic(isDrawingMode: boolean = false) {
     }
   }, [redrawAllLayers, isTerrainEnabled]);
 
-  // 3D Control functions
-  const toggle3D = useCallback(() => {
-    if (!map.current) return;
-    
-    const newPitch = is3DEnabled ? 0 : 60; // 0 = flat, 60 = 3D
-    
-    map.current.easeTo({
-      pitch: newPitch,
-      duration: 1000
-    });
-    
-    setIs3DEnabled(!is3DEnabled);
-  }, [is3DEnabled]);
-
   const resetView = useCallback(() => {
     if (!map.current) return;
     
@@ -192,26 +171,8 @@ export function useMapLogic(isDrawingMode: boolean = false) {
       duration: 1000
     });
     
-    setIs3DEnabled(false);
   }, []);
 
-  const rotateLeft = useCallback(() => {
-    if (!map.current) return;
-    
-    map.current.easeTo({
-      bearing: map.current.getBearing() - 45,
-      duration: 500
-    });
-  }, []);
-
-  const rotateRight = useCallback(() => {
-    if (!map.current) return;
-    
-    map.current.easeTo({
-      bearing: map.current.getBearing() + 45,
-      duration: 500
-    });
-  }, []);
 
   // Update handleMapLoad to use the selected style
   const handleMapLoad = useCallback((mapRef: React.MutableRefObject<mapboxgl.Map | null>) => {
@@ -408,12 +369,7 @@ export function useMapLogic(isDrawingMode: boolean = false) {
     // Map style
     mapStyle,
     handleMapStyleChange,
-    // 3D state
-    is3DEnabled,
-    toggle3D,
     resetView,
-    rotateLeft,
-    rotateRight,
     // Terrain state
     isTerrainEnabled,
     toggleTerrain,

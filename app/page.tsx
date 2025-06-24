@@ -66,11 +66,7 @@ export default function Home() {
     marker,
     mapStyle,
     handleMapStyleChange,
-    is3DEnabled,
-    toggle3D,
     resetView,
-    rotateLeft,
-    rotateRight,
     isTerrainEnabled,
     toggleTerrain,
   } = useMapLogic(isDrawingMode); // Pass drawing mode here
