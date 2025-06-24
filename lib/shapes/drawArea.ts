@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import * as turf from '@turf/turf';
 import { drawAreaTypes } from '@/lib/config/drawAreaTypes';
 import { useTranslations } from 'next-intl';
@@ -246,7 +245,6 @@ export function clearPolygonPreview(map: React.MutableRefObject<mapboxgl.Map | n
 };
 
 
-
 // Function to clear all polygons
 export function clearAllPolygons(
     map: React.MutableRefObject<mapboxgl.Map | null>,
@@ -255,6 +253,7 @@ export function clearAllPolygons(
     setCurrentPolygon: React.Dispatch<React.SetStateAction<[number, number][]>>,
     setPolygonTypes: React.Dispatch<React.SetStateAction<Record<number, string>>>
 ) {
+
     if (!map.current) return;
 
     // Clear completed polygons and their labels
@@ -292,4 +291,5 @@ export function clearAllPolygons(
     setDrawnPolygons([]);
     setCurrentPolygon([]);
     setPolygonTypes({});
+
 };

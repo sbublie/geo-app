@@ -61,25 +61,40 @@ export function usePolygonDrawing(mapRef: React.MutableRefObject<mapboxgl.Map | 
 
   // Clear all polygons
   const clearAllPolygons = useCallback(() => {
-    // Clear drawn polygons from state
-    setDrawnPolygons([]);
-    
-    // Clear polygons from map
-    if (mapRef.current) {
-      // Remove all polygon sources and layers
-      drawnPolygons.forEach((polygon, index) => {
-        const sourceId = `polygon-${index}`;
-        const layerId = `polygon-layer-${index}`;
-        
-        if (mapRef.current!.getLayer(layerId)) {
-          mapRef.current!.removeLayer(layerId);
-        }
-        if (mapRef.current!.getSource(sourceId)) {
-          mapRef.current!.removeSource(sourceId);
-        }
-      });
+    if (!mapRef.current) return;
+
+    // Remove all completed polygon layers/sources (fill, outline, label, bg)
+    for (let i = 0; i < 100; i++) {
+      // Polygon fill and outline
+      if (mapRef.current.getLayer(`completed-polygon-fill-${i}`)) {
+        mapRef.current.removeLayer(`completed-polygon-fill-${i}`);
+      }
+      if (mapRef.current.getLayer(`completed-polygon-outline-${i}`)) {
+        mapRef.current.removeLayer(`completed-polygon-outline-${i}`);
+      }
+      if (mapRef.current.getSource(`completed-polygon-${i}`)) {
+        mapRef.current.removeSource(`completed-polygon-${i}`);
+      }
+
+      // Polygon label text and background
+      if (mapRef.current.getLayer(`polygon-label-text-${i}`)) {
+        mapRef.current.removeLayer(`polygon-label-text-${i}`);
+      }
+      if (mapRef.current.getLayer(`polygon-label-bg-${i}`)) {
+        mapRef.current.removeLayer(`polygon-label-bg-${i}`);
+      }
+      if (mapRef.current.getSource(`polygon-label-${i}`)) {
+        mapRef.current.removeSource(`polygon-label-${i}`);
+      }
     }
-  }, [drawnPolygons, mapRef]);
+
+    // Clear the preview polygon if it exists
+    clearPolygonPreview(mapRef);
+
+    // Clear state
+    setDrawnPolygons([]);
+    setCurrentPolygon([]);
+  }, [mapRef]);
 
   // Handle drawing mode cursor and zoom behavior
   useEffect(() => {
