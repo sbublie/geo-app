@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import * as turf from '@turf/turf';
 import { drawAreaTypes } from '@/lib/config/drawAreaTypes';
 import { useTranslations } from 'next-intl';
