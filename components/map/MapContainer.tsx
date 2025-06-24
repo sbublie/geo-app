@@ -2,7 +2,6 @@
 
 import { useRef, useEffect } from 'react';
 import mapboxgl from 'mapbox-gl';
-import { mapbox_style } from "@/components/mapbox_style";
 
 const defaultLocation: [number, number] = [8.79053, 47.99143]; // Default coordinates for the map center
 
