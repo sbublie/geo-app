@@ -6,7 +6,7 @@ import GameControls from "@/components/game/GameControls";
 import DrawingControls from "@/components/drawing/DrawingControls";
 import InfoPanels from "@/components/info/InfoPanels";
 import FilterMenu from "@/components/map/FilterMenu";
-import LineDetailsDialog from "@/components/dialogs/LineDetailsDialog";
+import LineDetailsDialog from "@/components/dialogs/DetailsDialog";
 import AreaTypeDialog from "@/components/dialogs/AreaTypeDialog";
 import { getWindDirectionText } from "@/lib/api/weatherApi";
 
@@ -25,8 +25,8 @@ export default function Home() {
     appState,
     weatherData,
     weatherLoading,
-    selectedLine,
-    setSelectedLine,
+    selectedObject,
+    setSelectedObject,
     lineVisibility,
     enabledLineTypes,
     handleMapLoad,
@@ -34,7 +34,6 @@ export default function Home() {
     startGame,
     resetGame,
     handleToggleLineType,
-    getSelectedLineType,
     map,
     marker,
   } = useMapLogic();
@@ -113,12 +112,19 @@ export default function Home() {
       />
 
       {/* Detail Popups */}
-      {selectedLine && (
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
+      {selectedObject && (
+        <div
+          style={{
+            position: "absolute",
+            left: selectedObject.point.x,
+            top: selectedObject.point.y,
+            zIndex: 20,
+            pointerEvents: "auto",
+          }}
+        >
           <LineDetailsDialog
-            line={selectedLine}
-            type={getSelectedLineType(selectedLine)}
-            onClose={() => setSelectedLine(null)}
+            selectedObject={selectedObject.feature}
+            onClose={() => setSelectedObject(null)}
           />
         </div>
       )}

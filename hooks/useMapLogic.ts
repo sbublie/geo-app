@@ -15,8 +15,15 @@ import WeatherData from '@/types/WeatherData';
 import { usePolygonDrawing } from '@/hooks/usePolygonDrawing';
 import { LineType } from '@/types/LineConfig';
 import { lineConfig } from '@/lib/config/lineConfig';
+import { getAllInfrastructureNodes } from '@/lib/api/fetchOsmNodes';
+import { nodeConfig } from '@/lib/config/nodeConfig';
+import { addMarkers, removeAllMarkers } from '@/lib/shapes/marker';
+import GenericNode from '@/types/GenericNode';
+import { SelectedNodeWithPoint } from '@/lib/shapes/marker';
+import { SelectedLineWithPoint } from '@/lib/shapes/lines';
 
 const ENABLED_LINE_TYPES: LineType[] = Object.keys(lineConfig) as LineType[];
+const nodeTypes = Object.keys(nodeConfig) as Array<keyof typeof nodeConfig>;
 
 export function useMapLogic() {
   const map = useRef<mapboxgl.Map | null>(null);
@@ -35,7 +42,7 @@ export function useMapLogic() {
   const [appState, setGameState] = useState<'idle' | 'loading' | 'playing'>('idle');
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [weatherLoading, setWeatherLoading] = useState(false);
-  const [selectedLine, setSelectedLine] = useState<GenericLineFeature | null>(null);
+  const [selectedObject, setSelectedObject] = useState<SelectedLineWithPoint | SelectedNodeWithPoint | null>(null);
   
   // Generic line visibility state
   const [lineVisibility, setLineVisibility] = useState<Record<LineType, boolean>>(
@@ -46,6 +53,8 @@ export function useMapLogic() {
   const [lineData, setLineData] = useState<Record<LineType, GenericLine[]>>(
     ENABLED_LINE_TYPES.reduce((acc, type) => ({ ...acc, [type]: [] }), {} as Record<LineType, GenericLine[]>)
   );
+
+  const [nodeData, setNodeData] = useState<Record<string, any>>({});
 
   const handleMapLoad = useCallback((mapRef: React.MutableRefObject<mapboxgl.Map | null>) => {
     map.current = mapRef.current;
@@ -78,10 +87,10 @@ export function useMapLogic() {
   const handleToggleLineType = useCallback((lineType: LineType, show: boolean) => {
     setLineVisibility(prev => ({ ...prev, [lineType]: show }));
     if (show && lineData[lineType].length > 0) {
-      drawLines(lineData[lineType], lineType , map, setSelectedLine);
+      drawLines(lineData[lineType], lineType , map, setSelectedObject);
     } else {
       removeLines(lineType, map);
-      setSelectedLine(null);
+      setSelectedObject(null);
     }
   }, [lineData]);
 
@@ -97,12 +106,19 @@ export function useMapLogic() {
     try {
       const boundingBox = createBoundingBoxFromCenter(coordinates.lat, coordinates.lng, radius / 1000);
       const allLines = await getAllInfrastructureLines(boundingBox, ENABLED_LINE_TYPES);
+      const allNodes = await getAllInfrastructureNodes(boundingBox);
       setLineData(allLines);
+      setNodeData(allNodes);
+
+      // Add markers for each node type
+      nodeTypes.forEach((nodeType) => {
+        addMarkers(map, allNodes[nodeType], nodeType, setSelectedObject);
+      });
 
       // Draw visible line types
       ENABLED_LINE_TYPES.forEach((lineType) => {
         if (lineVisibility[lineType] && allLines[lineType].length > 0) {
-          drawLines(allLines[lineType], lineType, map, setSelectedLine);
+          drawLines(allLines[lineType], lineType, map, setSelectedObject);
         }
       });
 
@@ -115,28 +131,24 @@ export function useMapLogic() {
 
   const resetGame = useCallback(() => {
     setGameState('idle');
-    setSelectedLine(null);
+    setSelectedObject(null);
+
     // Remove all line types from map
     ENABLED_LINE_TYPES.forEach(lineType => {
       removeLines(lineType, map);
     });
+
+    // Remove ALL markers at once (simpler approach)
+    removeAllMarkers();
+
+    // Clear node data
+    setNodeData({});
     // Clear all line data
     setLineData(ENABLED_LINE_TYPES.reduce((acc, type) => ({ ...acc, [type]: [] }), {} as Record<LineType, GenericLine[]>));
     // Clear all polygons on reset
     clearAllPolygons();
   }, [map, clearAllPolygons]);
 
-  // Helper function to get line type from selected line
-  const getSelectedLineType = useCallback((line: GenericLineFeature | null): LineType => {
-    if (!line?.properties) return "highway";
-    for (const lineType of ENABLED_LINE_TYPES) {
-      const config = lineConfig[lineType];
-      if (line.properties[config.tagKey]) {
-        return lineType;
-      }
-    }
-    return "highway";
-  }, []);
 
   return {
     // State
@@ -148,8 +160,8 @@ export function useMapLogic() {
     appState,
     weatherData,
     weatherLoading,
-    selectedLine,
-    setSelectedLine,
+    selectedObject,
+    setSelectedObject,
     // Generic line state
     lineVisibility,
     lineData,
@@ -160,7 +172,6 @@ export function useMapLogic() {
     startGame,
     resetGame,
     handleToggleLineType,
-    getSelectedLineType,
     // Specific line type handlers for backward compatibility
     ...lineTypeHandlers,
     // Refs

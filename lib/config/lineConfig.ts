@@ -65,7 +65,7 @@ export const lineConfig: Record<LineType, LineConfig> = {
   },
   highway: {
     type: "highway",
-    type_values: ["motorway", "trunk", "primary", "secondary", "tertiary", "track", "cycleway", "service" ],
+    type_values: ["motorway", "trunk", "primary", "secondary", "tertiary", "track", "cycleway", "residential"],
     layerId: "highway-lines-layer",
     sourceId: "highway-lines",
     colors: {

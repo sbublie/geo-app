@@ -1,6 +1,7 @@
 import mapboxgl from 'mapbox-gl';
 import React from 'react';
 import { lineConfig } from '@/lib/config/lineConfig';
+import { SelectedNodeWithPoint } from './marker';
 
 // Define a generic interface for line features
 export interface GenericLineFeature extends GeoJSON.Feature {
@@ -9,6 +10,12 @@ export interface GenericLineFeature extends GeoJSON.Feature {
 
 export type LineTypeKey = keyof typeof lineConfig;
 
+// Add a type for the selected object with pixel position
+export interface SelectedLineWithPoint {
+  feature: GenericLineFeature;
+  point: { x: number; y: number };
+}
+
 /**
  * Draw any type of infrastructure lines on the map
  */
@@ -16,7 +23,7 @@ export function drawLines(
   features: GenericLineFeature[],
   lineType: LineTypeKey,
   map: React.MutableRefObject<mapboxgl.Map | null>,
-  setSelectedLine: React.Dispatch<React.SetStateAction<GenericLineFeature | null>>
+  setSelectedObject: React.Dispatch<React.SetStateAction<SelectedLineWithPoint | SelectedNodeWithPoint | null>>
 ) {
   if (!map.current) return;
 
@@ -79,7 +86,12 @@ export function drawLines(
   // Add click event listener
   map.current.on('click', config.layerId, (e) => {
     if (e.features && e.features[0]) {
-      setSelectedLine(e.features[0] as GenericLineFeature);
+      const feature = e.features[0] as GenericLineFeature;
+      const point = map.current!.project(e.lngLat);
+      setSelectedObject({
+        feature,
+        point: { x: point.x, y: point.y }
+      });
     }
   });
 

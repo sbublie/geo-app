@@ -98,6 +98,15 @@
         "surface": "Oberfläche",
         "ref": "Referenz"
       }
+    }, 
+    "nodes": {
+      "tree": {
+        "title": "Baum",
+        "species": "Art",
+        "height": "Höhe",
+        "diameter": "Durchmesser",
+        "health": "Gesundheit"
+      }
     }
   },
   "filters": {
