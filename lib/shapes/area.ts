@@ -1,8 +1,6 @@
 import mapboxgl from 'mapbox-gl';
 import React from 'react';
 import { areaConfig } from '@/lib/config/areaConfig';
-import GenericArea from '@/types/GenericArea';
-import { AreaType } from '@/types/AreaConfig';
 import { SelectedLineWithPoint } from './lines';
 
 export type AreaTypeKey = keyof typeof areaConfig;
