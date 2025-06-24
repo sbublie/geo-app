@@ -68,12 +68,12 @@ export const lineConfig: Record<LineType, LineConfig> = {
       default: "#fbbf24"
     },
     widths: {
-      motorway: 5,
-      trunk: 5,
-      primary: 5,
-      secondary: 3,
-      tertiary: 3,
-      default: 3
+      motorway: 8,
+      trunk: 8,
+      primary: 8,
+      secondary: 5,
+      tertiary: 5,
+      default: 5
     },
     tagKey: "highway",
     highlightFields: [

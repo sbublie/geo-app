@@ -13,6 +13,20 @@
     "active": "Katastrophe aktiv",
     "instructions": "Klicken Sie auf Zug- oder Stromleitungen, um Details anzuzeigen."
   },
+  "map": {
+    "title": "Karte",
+    "reset": "Ansicht zurücksetzen",
+    "styles": {
+      "title": "Kartenstile",
+      "streets": "Straße",
+      "satellite": "Satellit",
+      "dark": "Dunkel",
+      "light": "Hell",
+      "outdoors": "Outdoor",
+      "monochrome": "Monochrom",
+      "pencil": "Bleistift"
+    }
+  },
   "drawing": {
     "title": "Polygon zeichnen",
     "instructions": "Klicken zum Hinzufügen von Punkten, Doppelklick zum Beenden",

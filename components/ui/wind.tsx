@@ -1,44 +1,61 @@
-export default function WindArrow({ direction }: { direction: number }) {
+export default function WindArrow({ direction, size = 48 }: { direction: number; size?: number }) {
+
     return (
         <div className="flex items-center justify-center">
-            <div className="relative w-12 h-12">
+            <div 
+                className="relative"
+                style={{ width: size, height: size }}
+            >
+                {/* Outer circle with gradient */}
+                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-100 to-blue-50 border border-blue-200/50 shadow-sm"></div>
+                
+                {/* Wind direction arrow */}
                 <svg
-                    width="48"
-                    height="48"
+                    width={size}
+                    height={size}
                     viewBox="0 0 48 48"
                     className="absolute"
                     style={{ transform: `rotate(${direction}deg)` }}
                 >
                     <defs>
+                        <linearGradient id="arrowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stopColor="#3b82f6" />
+                            <stop offset="100%" stopColor="#1d4ed8" />
+                        </linearGradient>
                         <marker
-                            id="arrowhead"
-                            markerWidth="10"
-                            markerHeight="7"
-                            refX="9"
-                            refY="3.5"
+                            id="modernArrowhead"
+                            markerWidth="12"
+                            markerHeight="8"
+                            refX="10"
+                            refY="4"
                             orient="auto"
                         >
                             <polygon
-                                points="0 0, 10 3.5, 0 7"
-                                fill="#1f2937"
+                                points="0 0, 12 4, 0 8"
+                                fill="url(#arrowGradient)"
+                                className="drop-shadow-sm"
                             />
                         </marker>
                     </defs>
+                    
+                    {/* Main arrow line */}
                     <line
                         x1="24"
-                        y1="40"
+                        y1="36"
                         x2="24"
-                        y2="8"
-                        stroke="#1f2937"
-                        strokeWidth="3"
-                        markerEnd="url(#arrowhead)"
+                        y2="12"
+                        stroke="url(#arrowGradient)"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        markerEnd="url(#modernArrowhead)"
+                        className="drop-shadow-sm"
                     />
                 </svg>
-                <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                </div>
+                
+
+                
+
             </div>
         </div>
     );
-
 }

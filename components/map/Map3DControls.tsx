@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { RotateCcw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface Map3DControlsProps {
   onResetView: () => void;
@@ -13,16 +14,16 @@ export default function Map3DControls({
   disabled = false 
 }: Map3DControlsProps) {
   return (
-    <button
+    <Button
       onClick={onResetView}
       disabled={disabled}
-      className={`px-3 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 bg-white/90 text-gray-700 hover:bg-white/95 border border-gray-200 ${
-        disabled ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-sm'
-      }`}
+      variant="outline"
+      size="sm"
+      className="flex items-center gap-2 bg-white/90 backdrop-blur-sm"
       title="Reset View (Remove 3D & Rotation)"
     >
       <RotateCcw size={16} />
       Reset View
-    </button>
+    </Button>
   );
 }

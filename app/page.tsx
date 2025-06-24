@@ -121,23 +121,6 @@ export default function Home() {
         mapStyle={mapStyle}
       />
 
-      {/* Filter Menu */}
-      {appState === "playing" && (
-        <div className="absolute top-4 left-4 z-10">
-          <FilterMenu
-            lineVisibility={lineVisibility}
-            enabledLineTypes={enabledLineTypes}
-            onToggleLineType={handleToggleLineType}
-            nodeVisibility={nodeVisibility}
-            enabledNodeTypes={enabledNodeTypes}
-            onToggleNodeType={handleToggleNodeType}
-            areaVisibility={areaVisibility}
-            enabledAreaTypes={enabledAreaTypes}
-            onToggleAreaType={handleToggleAreaType}
-          />
-        </div>
-      )}
-
       {/* Top-right controls container */}
       <div className="absolute top-4 right-4 flex flex-col gap-4 z-10">
         {/* Game Controls */}
@@ -192,6 +175,22 @@ export default function Home() {
       <div className="absolute bottom-6 left-4 flex flex-col gap-2 z-10">
         {/* Terrain Toggle and Reset View buttons - side by side */}
         <div className="flex gap-2">
+          <FilterMenu
+            lineVisibility={lineVisibility}
+            enabledLineTypes={enabledLineTypes}
+            onToggleLineType={handleToggleLineType}
+            nodeVisibility={nodeVisibility}
+            enabledNodeTypes={enabledNodeTypes}
+            onToggleNodeType={handleToggleNodeType}
+            areaVisibility={areaVisibility}
+            enabledAreaTypes={enabledAreaTypes}
+            onToggleAreaType={handleToggleAreaType}
+          />
+          {/* Map Style Switcher */}
+          <MapStyleSwitcher
+            currentStyle={mapStyle}
+            onChange={handleMapStyleChange}
+          />
           <TerrainToggle
             isTerrainEnabled={isTerrainEnabled}
             onToggle={toggleTerrain}
@@ -201,13 +200,8 @@ export default function Home() {
             onResetView={resetView}
             disabled={appState === "loading"}
           />
+          
         </div>
-
-        {/* Map Style Switcher */}
-        <MapStyleSwitcher
-          currentStyle={mapStyle}
-          onChange={handleMapStyleChange}
-        />
       </div>
 
       <DrawAreaTypeDialog

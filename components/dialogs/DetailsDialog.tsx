@@ -174,7 +174,7 @@ export default function DetailsDialog({ selectedObject, onClose }: DetailsDialog
           ×
         </button>
       </div>
-      <SelectSeparator className="mb-3 h-[4px]" />
+      <SelectSeparator className="mb-2 h-[2px]" />
 
       <div className="space-y-2">
         {highlightFields.map(({ key, labelKey, color }) =>
@@ -194,7 +194,7 @@ export default function DetailsDialog({ selectedObject, onClose }: DetailsDialog
         )}
         
         {/* Only show separator if there are highlight fields */}
-        {hasHighlightFields && <SelectSeparator className="mb-3 h-[4px]" />}
+        {hasHighlightFields && <SelectSeparator className="mb-3 h-[2px]" />}
         
         {/* Display all other properties */}
         {Object.entries(properties).map(([key, value]) => {

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Mountain, MountainSnow } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface TerrainToggleProps {
   isTerrainEnabled: boolean;
@@ -15,14 +16,16 @@ export default function TerrainToggle({
   disabled = false 
 }: TerrainToggleProps) {
   return (
-    <button
+    <Button
       onClick={onToggle}
       disabled={disabled}
-      className={`px-3 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
+      variant={isTerrainEnabled ? "default" : "outline"}
+      size="sm"
+      className={`flex items-center gap-2 ${
         isTerrainEnabled
-          ? 'bg-green-600 text-white shadow-md'
-          : 'bg-white/90 text-gray-700 hover:bg-white/95 border border-gray-200'
-      } ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-sm'}`}
+          ? 'bg-green-600 hover:bg-green-700 text-white'
+          : 'bg-white/90 backdrop-blur-sm'
+      }`}
       title={isTerrainEnabled ? 'Disable Terrain' : 'Enable Terrain'}
     >
       {isTerrainEnabled ? (
@@ -31,6 +34,6 @@ export default function TerrainToggle({
         <Mountain size={16} />
       )}
       Terrain
-    </button>
+    </Button>
   );
 }

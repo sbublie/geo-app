@@ -21,7 +21,7 @@ export default function DrawingControls({
   const t = useTranslations();
 
   return (
-    <div className="bg-white bg-opacity-90 p-3 rounded-lg shadow-lg border max-w-[370px]">
+    <div className="bg-white bg-opacity-90 p-3 rounded-lg shadow-lg border max-w-[300px]">
       <div className="text-sm font-semibold text-gray-700 mb-2">{t('drawing.title')}</div>
       <div className="text-xs text-gray-600 mb-3">
         {isDrawingMode ? t('drawing.instructions') : t('drawing.instructionsIdle')}
