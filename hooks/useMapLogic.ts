@@ -22,9 +22,15 @@ import { addMarkers, removeAllMarkers, removeMarkers } from '@/lib/shapes/marker
 import GenericNode from '@/types/GenericNode';
 import { SelectedNodeWithPoint } from '@/lib/shapes/marker';
 import { SelectedLineWithPoint } from '@/lib/shapes/lines';
+import { AreaType } from '@/types/AreaConfig';
+import { areaConfig } from '@/lib/config/areaConfig';
+import { getAllInfrastructureAreas } from '@/lib/api/fetchOsmAreas';
+import { drawAreas, removeAreas, SelectedAreaWithPoint } from '@/lib/shapes/area';
+import GenericArea from '@/types/GenericArea';
 
 const ENABLED_LINE_TYPES: LineType[] = Object.keys(lineConfig) as LineType[];
 const ENABLED_NODE_TYPES: NodeType[] = Object.keys(nodeConfig) as NodeType[];
+const ENABLED_AREA_TYPES: AreaType[] = Object.keys(areaConfig) as AreaType[];
 
 export function useMapLogic() {
   const map = useRef<mapboxgl.Map | null>(null);
@@ -43,7 +49,7 @@ export function useMapLogic() {
   const [appState, setGameState] = useState<'idle' | 'loading' | 'playing'>('idle');
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [weatherLoading, setWeatherLoading] = useState(false);
-  const [selectedObject, setSelectedObject] = useState<SelectedLineWithPoint | SelectedNodeWithPoint | null>(null);
+  const [selectedObject, setSelectedObject] = useState<SelectedLineWithPoint | SelectedNodeWithPoint | SelectedAreaWithPoint | null>(null);
   
   // Generic line visibility state
   const [lineVisibility, setLineVisibility] = useState<Record<LineType, boolean>>(
@@ -55,6 +61,11 @@ export function useMapLogic() {
     ENABLED_NODE_TYPES.reduce((acc, type) => ({ ...acc, [type]: true }), {} as Record<NodeType, boolean>)
   );
   
+  // Generic area visibility state
+  const [areaVisibility, setAreaVisibility] = useState<Record<AreaType, boolean>>(
+    ENABLED_AREA_TYPES.reduce((acc, type) => ({ ...acc, [type]: true }), {} as Record<AreaType, boolean>)
+  );
+  
   // Generic line data storage
   const [lineData, setLineData] = useState<Record<LineType, GenericLine[]>>(
     ENABLED_LINE_TYPES.reduce((acc, type) => ({ ...acc, [type]: [] }), {} as Record<LineType, GenericLine[]>)
@@ -63,6 +74,11 @@ export function useMapLogic() {
   // Generic node data storage
   const [nodeData, setNodeData] = useState<Record<NodeType, GenericNode[]>>(
     ENABLED_NODE_TYPES.reduce((acc, type) => ({ ...acc, [type]: [] }), {} as Record<NodeType, GenericNode[]>)
+  );
+
+  // Generic area data storage
+  const [areaData, setAreaData] = useState<Record<AreaType, GenericArea[]>>(
+    ENABLED_AREA_TYPES.reduce((acc, type) => ({ ...acc, [type]: [] }), {} as Record<AreaType, GenericArea[]>)
   );
 
   const handleMapLoad = useCallback((mapRef: React.MutableRefObject<mapboxgl.Map | null>) => {
@@ -114,14 +130,28 @@ export function useMapLogic() {
     }
   }, [nodeData]);
 
+  // Generic toggle function for any area type
+  const handleToggleAreaType = useCallback((areaType: AreaType, show: boolean) => {
+    setAreaVisibility(prev => ({ ...prev, [areaType]: show }));
+    if (show && areaData[areaType].length > 0) {
+      drawAreas(areaData[areaType], areaType, map, setSelectedObject);
+    } else {
+      removeAreas(areaType, map);
+      setSelectedObject(null);
+    }
+  }, [areaData]);
+
   const startGame = useCallback(async () => {
     setGameState('loading');
     try {
       const boundingBox = createBoundingBoxFromCenter(coordinates.lat, coordinates.lng, radius / 1000);
       const allLines = await getAllInfrastructureLines(boundingBox, ENABLED_LINE_TYPES);
       const allNodes = await getAllInfrastructureNodes(boundingBox);
+      const allAreas = await getAllInfrastructureAreas(boundingBox);
+      
       setLineData(allLines);
       setNodeData(allNodes);
+      setAreaData(allAreas);
 
       // Add markers for visible node types
       ENABLED_NODE_TYPES.forEach((nodeType) => {
@@ -137,12 +167,19 @@ export function useMapLogic() {
         }
       });
 
+      // Draw visible areas
+      ENABLED_AREA_TYPES.forEach((areaType) => {
+        if (areaVisibility[areaType] && allAreas[areaType].length > 0) {
+          drawAreas(allAreas[areaType], areaType, map, setSelectedObject);
+        }
+      });
+
       setGameState('playing');
     } catch (error) {
       console.error('Failed to load game elements:', error);
       setGameState('idle');
     }
-  }, [coordinates, radius, lineVisibility, nodeVisibility]);
+  }, [coordinates, radius, lineVisibility, nodeVisibility, areaVisibility]);
 
   const resetGame = useCallback(() => {
     setGameState('idle');
@@ -153,12 +190,23 @@ export function useMapLogic() {
       removeLines(lineType, map);
     });
 
+    // Remove all node types from map
+    ENABLED_NODE_TYPES.forEach(nodeType => {
+      removeMarkers(nodeType, map, nodeData);
+    });
+
+    // Remove all area types from map
+    ENABLED_AREA_TYPES.forEach(areaType => {
+      removeAreas(areaType, map);
+    });
+
     // Remove ALL markers at once
     removeAllMarkers();
 
-    // Clear node and line data
+    // Clear node, line, and area data
     setNodeData(ENABLED_NODE_TYPES.reduce((acc, type) => ({ ...acc, [type]: [] }), {} as Record<NodeType, GenericNode[]>));
     setLineData(ENABLED_LINE_TYPES.reduce((acc, type) => ({ ...acc, [type]: [] }), {} as Record<LineType, GenericLine[]>));
+    setAreaData(ENABLED_AREA_TYPES.reduce((acc, type) => ({ ...acc, [type]: [] }), {} as Record<AreaType, GenericArea[]>));
     
     // Clear all polygons on reset
     clearAllPolygons();
@@ -184,6 +232,10 @@ export function useMapLogic() {
     nodeVisibility,
     nodeData,
     enabledNodeTypes: ENABLED_NODE_TYPES,
+    // Generic area state
+    areaVisibility,
+    areaData,
+    enabledAreaTypes: ENABLED_AREA_TYPES,
     // Handlers
     handleMapLoad,
     handleMarkerDragEnd,
@@ -191,6 +243,7 @@ export function useMapLogic() {
     resetGame,
     handleToggleLineType,
     handleToggleNodeType,
+    handleToggleAreaType,
     // Refs
     map,
     marker,

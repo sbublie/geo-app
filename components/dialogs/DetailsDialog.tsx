@@ -5,11 +5,14 @@ import { LineType } from "@/types/LineConfig";
 import { lineConfig } from '@/lib/config/lineConfig';
 import { NodeType } from "@/types/NodeConfig";
 import { nodeConfig } from '@/lib/config/nodeConfig';
+import { AreaType } from "@/types/AreaConfig";
+import { areaConfig } from '@/lib/config/areaConfig';
 import GenericNode from "@/types/GenericNode";
 import { GenericLineFeature } from "@/lib/shapes/lines";
+import { GenericAreaFeature } from "@/lib/shapes/area";
 
 interface DetailsDialogProps {
-  selectedObject: GenericLineFeature | GenericNode;
+  selectedObject: GenericLineFeature | GenericNode | GenericAreaFeature;
   onClose: () => void;
 }
 
@@ -17,37 +20,70 @@ export default function DetailsDialog({ selectedObject, onClose }: DetailsDialog
   // Always call hooks at the top
   const lineTranslations = useTranslations("osm.lines");
   const nodeTranslations = useTranslations("osm.nodes");
+  const areaTranslations = useTranslations("osm.areas");
 
   if (!selectedObject) return null;
 
   const properties = selectedObject.properties || {};
 
   // Determine type based on geometry and properties
-  function determineType(): { type: LineType | NodeType; isLine: boolean } {
-    const isLineGeometry = selectedObject.geometry.type === 'LineString';
+  function determineType(): { type: LineType | NodeType | AreaType; objectType: 'line' | 'node' | 'area' } {
+    const geometryType = selectedObject.geometry.type;
     
-    if (isLineGeometry) {
+    if (geometryType === 'LineString') {
       // It's a line - check which line type
       for (const [lineType, config] of Object.entries(lineConfig)) {
         if (properties[config.tagKey]) {
-          return { type: lineType as LineType, isLine: true };
+          return { type: lineType as LineType, objectType: 'line' };
         }
       }
-      return { type: 'railway' as LineType, isLine: true }; // fallback
-    } else {
+      return { type: 'railway' as LineType, objectType: 'line' }; // fallback
+    } else if (geometryType === 'Point') {
       // It's a node - check which node type
       for (const [nodeType, config] of Object.entries(nodeConfig)) {
         if (properties[config.tagKey]) {
-          return { type: nodeType as NodeType, isLine: false };
+          return { type: nodeType as NodeType, objectType: 'node' };
         }
       }
-      return { type: 'tree' as NodeType, isLine: false }; // fallback
+      return { type: 'tree' as NodeType, objectType: 'node' }; // fallback
+    } else if (geometryType === 'Polygon') {
+      // It's an area - check which area type
+      for (const [areaType, config] of Object.entries(areaConfig)) {
+        if (properties[config.tagKey]) {
+          return { type: areaType as AreaType, objectType: 'area' };
+        }
+      }
+      return { type: 'landuse' as AreaType, objectType: 'area' }; // fallback
     }
+    
+    // Default fallback
+    return { type: 'railway' as LineType, objectType: 'line' };
   }
 
-  const { type, isLine } = determineType();
-  const config = isLine ? lineConfig[type as LineType] : nodeConfig[type as NodeType];
-  const t = isLine ? lineTranslations : nodeTranslations;
+  const { type, objectType } = determineType();
+  
+  // Get appropriate config and translations based on object type
+  let config;
+  let t;
+  
+  switch (objectType) {
+    case 'line':
+      config = lineConfig[type as LineType];
+      t = lineTranslations;
+      break;
+    case 'node':
+      config = nodeConfig[type as NodeType];
+      t = nodeTranslations;
+      break;
+    case 'area':
+      config = areaConfig[type as AreaType];
+      t = areaTranslations;
+      break;
+    default:
+      config = lineConfig[type as LineType];
+      t = lineTranslations;
+  }
+
   const highlightFields = config.highlightFields || [];
 
   // Check if there are any highlight fields with values
@@ -73,7 +109,7 @@ export default function DetailsDialog({ selectedObject, onClose }: DetailsDialog
           properties[key] ? (
             <div
               key={key}
-              className={`text-sm ${color ? `bg-${color}-50` : ""} rounded `}
+              className={`text-sm ${color ? `bg-${color}-50` : ""} rounded`}
             >
               <span className={`font-semibold ${color ? `text-${color}-800` : ""}`}>
                 {t(`${type}.${labelKey}`) || labelKey}:

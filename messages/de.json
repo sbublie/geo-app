@@ -113,6 +113,14 @@
         "voltage": "Spannung",
         "operator": "Betrieber"
       }
+    },
+    "areas": {
+      "landuse": {
+        "title": "Landfläche",
+        "type": "Typ",
+        "name": "Name",
+        "area": "Fläche"
+      }
     }
   },
   "filters": {
@@ -126,6 +134,7 @@
     "railwayLines": "Eisenbahnlinien",
     "highwayLines": "Straßen",
     "treeNodes": "Bäume",
-    "powerNodes": "Stromknoten"
+    "powerNodes": "Stromknoten",
+    "landuseAreas": "Landflächen"
   }
 }

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import mapboxgl from 'mapbox-gl';
-import { addCompletedPolygon, updatePolygonPreview, clearAllPolygons, clearPolygonPreview } from "@/lib/shapes/polygon";
+import { addCompletedPolygon, updatePolygonPreview, clearAllPolygons, clearPolygonPreview } from "@/lib/shapes/drawArea";
 import { useTranslations } from 'next-intl';
 
 export function usePolygonDrawing(map: React.MutableRefObject<mapboxgl.Map | null>) {

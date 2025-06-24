@@ -31,12 +31,15 @@ export default function Home() {
     enabledLineTypes,
     nodeVisibility,
     enabledNodeTypes,
+    areaVisibility,
+    enabledAreaTypes,
     handleMapLoad,
     handleMarkerDragEnd,
     startGame,
     resetGame,
     handleToggleLineType,
     handleToggleNodeType,
+    handleToggleAreaType,
     map,
     marker,
   } = useMapLogic();
@@ -81,6 +84,9 @@ export default function Home() {
             nodeVisibility={nodeVisibility}
             enabledNodeTypes={enabledNodeTypes}
             onToggleNodeType={handleToggleNodeType}
+            areaVisibility={areaVisibility}
+            enabledAreaTypes={enabledAreaTypes}
+            onToggleAreaType={handleToggleAreaType}
           />
         </div>
       )}

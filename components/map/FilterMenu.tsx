@@ -12,8 +12,10 @@ import { Filter } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { LineType } from '@/types/LineConfig';
 import { NodeType } from '@/types/NodeConfig';
+import { AreaType } from '@/types/AreaConfig';
 import { lineConfig } from '@/lib/config/lineConfig';
 import { nodeConfig } from '@/lib/config/nodeConfig';
+import { areaConfig } from '@/lib/config/areaConfig';
 
 interface FilterMenuProps {
   lineVisibility: Record<LineType, boolean>;
@@ -23,6 +25,10 @@ interface FilterMenuProps {
   nodeVisibility: Record<NodeType, boolean>;
   enabledNodeTypes: NodeType[];
   onToggleNodeType: (nodeType: NodeType, show: boolean) => void;
+
+  areaVisibility: Record<AreaType, boolean>;
+  enabledAreaTypes: AreaType[];
+  onToggleAreaType: (areaType: AreaType, show: boolean) => void;
 }
 
 export default function FilterMenu({
@@ -32,6 +38,9 @@ export default function FilterMenu({
   nodeVisibility,
   enabledNodeTypes,
   onToggleNodeType,
+  areaVisibility,
+  enabledAreaTypes,
+  onToggleAreaType,
 }: FilterMenuProps) {
   const t = useTranslations();
   const [isOpen, setIsOpen] = useState(false);
@@ -99,6 +108,36 @@ export default function FilterMenu({
                     >
                       <IconComponent size={16} className={colorClass} />
                       {t(`filters.${nodeType}Nodes`) || nodeType}
+                    </label>
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        )}
+
+        {/* Area types */}
+        {enabledAreaTypes.length > 0 && (
+          <>
+            <DropdownMenuSeparator />
+            <div className="p-2 space-y-3">
+              {enabledAreaTypes.map((areaType) => {
+                const config = areaConfig[areaType];
+                const IconComponent = config.icon || Filter;
+                const colorClass = config.colorClass || 'text-gray-600';
+                return (
+                  <div key={areaType} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`${areaType}-areas`}
+                      checked={areaVisibility[areaType] || false}
+                      onCheckedChange={(show) => onToggleAreaType(areaType, !!show)}
+                    />
+                    <label
+                      htmlFor={`${areaType}-areas`}
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center gap-2 cursor-pointer"
+                    >
+                      <IconComponent size={16} className={colorClass} />
+                      {t(`filters.${areaType}Areas`) || areaType}
                     </label>
                   </div>
                 );
