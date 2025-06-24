@@ -11,10 +11,7 @@ export function getAvailableLineTypes(): Array<{ key: LineType; config: LineConf
 // Config for all line types
 export const lineConfig: Record<LineType, LineConfig> = {
   railway: {
-    type: "railway",
     tagValues: ["rail", "light_rail", "subway", "tram"],
-    layerId: "railway-lines-layer",
-    sourceId: "railway-lines",
     colors: {
       rail: "#16a34a",
       light_rail: "#16a34a",
@@ -39,10 +36,7 @@ export const lineConfig: Record<LineType, LineConfig> = {
     colorClass: "text-green-600"
   },
   power: {
-    type: "power",
     tagValues: ["line", "cable", "minor_line"],
-    layerId: "power-lines-layer",
-    sourceId: "power-lines",
     colors: {
       line: "#dc2626",
       cable: "#dc2626",
@@ -64,10 +58,7 @@ export const lineConfig: Record<LineType, LineConfig> = {
     colorClass: "text-red-600"
   },
   highway: {
-    type: "highway",
     tagValues: ["motorway", "trunk", "primary", "secondary", "tertiary", "track", "cycleway", "residential"],
-    layerId: "highway-lines-layer",
-    sourceId: "highway-lines",
     colors: {
       motorway: "#f59e42",
       trunk: "#f59e42",
@@ -93,10 +84,7 @@ export const lineConfig: Record<LineType, LineConfig> = {
     colorClass: "text-yellow-300"
   },
   waterway: {
-    type: "waterway",
     tagValues: ["river", "stream", "canal", "drain"],
-    layerId: "waterway-lines-layer",
-    sourceId: "waterway-lines",
     colors: {
       river: "#38bdf8",
       stream: "#0ea5e9",
@@ -120,10 +108,8 @@ export const lineConfig: Record<LineType, LineConfig> = {
     colorClass: "text-blue-400"
   },
   pipeline: {
-    type: "pipeline",
     //tagValues: [],
-    layerId: "pipeline-lines-layer",
-    sourceId: "pipeline-lines",
+    
     colors: {
       pipeline: "#747474",
       default: "#747474"

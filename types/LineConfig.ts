@@ -10,10 +10,7 @@ export interface HighlightField {
 }
 
 export interface LineConfig {
-  type: LineType;
   tagValues?: string[]; // Optional for types with multiple values
-  layerId: string;
-  sourceId: string;
   colors: Record<string, string>;
   widths: Record<string, number>;
   tagKey: string;
