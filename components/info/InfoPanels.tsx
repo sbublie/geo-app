@@ -23,7 +23,7 @@ export default function InfoPanels({
   const t = useTranslations();
 
   return (
-    <div className="absolute bottom-14 right-4 flex flex-col gap-4 z-10">
+    <div className="absolute bottom-6 right-4 flex flex-col gap-4 z-10">
       {/* Weather info display */}
       <div className="bg-white bg-opacity-90 p-4 rounded-lg shadow-lg border min-w-[370px]">
         <div className="text-sm font-semibold text-gray-700 mb-3">{t('weather.title')}</div>

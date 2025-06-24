@@ -136,7 +136,7 @@ export default function Home() {
       {/* Top-right controls container */}
       <div className="absolute top-4 right-4 flex flex-col gap-4 z-10">
         {/* Map Style Switcher */}
-        <MapStyleSwitcher currentStyle={mapStyle} onChange={handleMapStyleChange} />
+        
 
         {/* Game Controls */}
         <GameControls
@@ -185,6 +185,10 @@ export default function Home() {
           />
         </div>
       )}
+
+      <div className="absolute bottom-6 left-4 z-10">
+        <MapStyleSwitcher currentStyle={mapStyle} onChange={handleMapStyleChange} />
+      </div>
 
       <DrawAreaTypeDialog
         showAreaTypeDialog={showAreaTypeDialog}
